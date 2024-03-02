@@ -8,8 +8,6 @@ The following guides illustrate how to run the project:
    cd FrontEnd
    ```
 
-````
-
 2. **Build the React project:**
 
    ```bash
@@ -33,5 +31,3 @@ The following guides illustrate how to run the project:
    ```bash
    mvn spring-boot:run
    ```
-
-````
