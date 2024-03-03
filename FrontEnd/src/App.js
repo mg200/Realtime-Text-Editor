@@ -6,10 +6,13 @@ import Signup from "./components/signup";
 import Navbar from "../src/components/navbar";
 
 function App() {
+  const [option, setOption] = useState("");
   return (
     <>
-      <Navbar />
-      <TextEditor />
+      <Navbar setOption={setOption} />
+      {option === "signup" ? <Signup /> : null}
+      {option === "login" ? <Login /> : null}
+      {option === "texteditor" ? <TextEditor /> : null}
     </>
   );
 }

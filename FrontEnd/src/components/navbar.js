@@ -1,18 +1,21 @@
-import React from "react";
+import React, { useState } from "react";
+import { SiMdnwebdocs } from "react-icons/si";
+import { FaThList } from "react-icons/fa";
+import { IoMdLogIn } from "react-icons/io";
+import { FaSignInAlt } from "react-icons/fa";
+import { RiFileEditFill } from "react-icons/ri";
 
-export default function Navbar() {
+export default function Navbar({ setOption }) {
   return (
     <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
-      {/* Container wrapper */}
       <div className="container-fluid">
-        {/* Navbar brand */}
-        <a className="navbar-brand" href="#">
-          Navbar
+        <a className="navbar-brand text-primary ms-5" href="#">
+          <SiMdnwebdocs size={50} />
+          <span> HMAM </span>
         </a>
 
-        {/* Toggle button */}
         <button
-          className="navbar-toggler"
+          className="navbar-toggler text-primary me-5"
           type="button"
           data-mdb-toggle="collapse"
           data-mdb-target="#navbarSupportedContent"
@@ -20,135 +23,112 @@ export default function Navbar() {
           aria-expanded="false"
           aria-label="Toggle navigation"
         >
-          <i className="fas fa-bars text-light"></i>
+          <OptionList setOption={setOption} />
         </button>
 
-        {/* Collapsible wrapper */}
         <div className="collapse navbar-collapse" id="navbarSupportedContent">
-          {/* Left links */}
-          <ul className="navbar-nav me-auto d-flex flex-row mt-3 mt-lg-0">
-            <li className="nav-item text-center mx-2 mx-lg-1">
-              <a className="nav-link active" aria-current="page" href="#!">
-                <div>
-                  <i className="fas fa-home fa-lg mb-1"></i>
-                </div>
-                Home
-              </a>
-            </li>
-            <li className="nav-item text-center mx-2 mx-lg-1">
-              <a className="nav-link" href="#!">
-                <div>
-                  <i className="far fa-envelope fa-lg mb-1"></i>
-                  <span className="badge rounded-pill badge-notification bg-danger">
-                    11
-                  </span>
-                </div>
-                Link
-              </a>
-            </li>
-            <li className="nav-item text-center mx-2 mx-lg-1">
-              <a className="nav-link disabled" aria-disabled="true" href="#!">
-                <div>
-                  <i className="far fa-envelope fa-lg mb-1"></i>
-                  <span className="badge rounded-pill badge-notification bg-warning">
-                    11
-                  </span>
-                </div>
-                Disabled
-              </a>
-            </li>
-            <li className="nav-item dropdown text-center mx-2 mx-lg-1">
-              <a
-                className="nav-link dropdown-toggle"
-                href="#"
-                id="navbarDropdown"
-                role="button"
-                data-mdb-toggle="dropdown"
-                aria-expanded="false"
-              >
-                <div>
-                  <i className="far fa-envelope fa-lg mb-1"></i>
-                  <span className="badge rounded-pill badge-notification bg-primary">
-                    11
-                  </span>
-                </div>
-                Dropdown
-              </a>
-              {/* Dropdown menu */}
-              <ul
-                className="dropdown-menu dropdown-menu-dark"
-                aria-labelledby="navbarDropdown"
-              >
-                <li>
-                  <a className="dropdown-item" href="#">
-                    Action
-                  </a>
-                </li>
-                <li>
-                  <a className="dropdown-item" href="#">
-                    Another action
-                  </a>
-                </li>
-                <li>
-                  <hr className="dropdown-divider" />
-                </li>
-                <li>
-                  <a className="dropdown-item" href="#">
-                    Something else here
-                  </a>
-                </li>
-              </ul>
-            </li>
-          </ul>
-          {/* Left links */}
-
-          {/* Right links */}
           <ul className="navbar-nav ms-auto d-flex flex-row mt-3 mt-lg-0">
-            <li className="nav-item text-center mx-2 mx-lg-1">
-              <a className="nav-link" href="#!">
+            <li
+              className="nav-item text-center mx-2 mx-lg-1"
+              onClick={() => setOption("login")}
+            >
+              <div className="nav-link" href="/">
                 <div>
                   <i className="fas fa-bell fa-lg mb-1"></i>
                   <span className="badge rounded-pill badge-notification bg-info">
-                    11
+                    Login
                   </span>
                 </div>
-                Messages
-              </a>
+                <IoMdLogIn />
+              </div>
             </li>
-            <li className="nav-item text-center mx-2 mx-lg-1">
-              <a className="nav-link" href="#!">
+            <li
+              className="nav-item text-center mx-2 mx-lg-1"
+              onClick={() => setOption("signup")}
+            >
+              <div className="nav-link" href="/">
                 <div>
-                  <i className="fas fa-globe-americas fa-lg mb-1"></i>
-                  <span className="badge rounded-pill badge-notification bg-success">
-                    11
+                  <i className="fas fa-bell fa-lg mb-1"></i>
+                  <span className="badge rounded-pill badge-notification bg-info">
+                    Sign up
                   </span>
                 </div>
-                News
-              </a>
+                <FaSignInAlt />
+              </div>
+            </li>
+            <li
+              className="nav-item text-center mx-2 mx-lg-1"
+              onClick={() => setOption("texteditor")}
+            >
+              <div className="nav-link" href="/">
+                <div>
+                  <i className="fas fa-bell fa-lg mb-1"></i>
+                  <span className="badge rounded-pill badge-notification bg-info">
+                    Text Editor
+                  </span>
+                </div>
+                <RiFileEditFill />
+              </div>
             </li>
           </ul>
-          {/* Right links */}
-
-          {/* Search form */}
-          <form className="d-flex input-group w-auto ms-lg-3 my-3 my-lg-0">
-            <input
-              type="search"
-              className="form-control"
-              placeholder="Search"
-              aria-label="Search"
-            />
-            <button
-              className="btn btn-primary"
-              type="button"
-              data-mdb-ripple-color="dark"
-            >
-              Search
-            </button>
-          </form>
         </div>
-        {/* Collapsible wrapper */}
       </div>
-      {/* Container wrapper */}
     </nav>
+  );
+}
+
+function OptionList({ setOption }) {
+  const [isOpen, setIsOpen] = useState(false);
+
+  const toggleDropdown = () => {
+    setIsOpen(!isOpen);
+  };
+
+  return (
+    <div className="dropdown" onClick={toggleDropdown}>
+      <button
+        className="btn  dropdown-toggle text-primary"
+        aria-expanded={isOpen ? "true" : "false"}
+      >
+        <FaThList size={25} />
+      </button>
+      <ul className={`dropdown-menu${isOpen ? " show" : ""}`}>
+        <ul className="navbar-nav mt-3">
+          <li
+            className=" text-center mx-2 my-2 "
+            onClick={() => setOption("login")}
+          >
+            <div>
+              <i className="fas fa-bell fa-lg mb-1"></i>
+              <span className="badge rounded-pill badge-notification bg-info">
+                Login
+              </span>
+            </div>
+          </li>
+          <li
+            className="nav-item text-center mx-2 my-2 mx-lg-1"
+            onClick={() => setOption("signup")}
+          >
+            <div>
+              <i className="fas fa-bell fa-lg mb-1"></i>
+              <span className="badge rounded-pill badge-notification bg-info">
+                Sign up
+              </span>
+            </div>
+          </li>
+          <li
+            className="nav-item text-center my-2 mx-2 mx-lg-1"
+            onClick={() => setOption("texteditor")}
+          >
+            <div>
+              <i className="fas fa-bell fa-lg mb-1"></i>
+              <span className="badge rounded-pill badge-notification bg-info">
+                Text Editor
+              </span>
+            </div>
+          </li>
+        </ul>
+      </ul>
+    </div>
   );
 }
