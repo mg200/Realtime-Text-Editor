@@ -6,11 +6,13 @@ import Document from "./components/Document";
 import TextEditor from './components/textEditor'; 
 
 function App() {
+  const [option, setOption] = useState("");
   return (
     <>
-      <Navbar />
-      <Document />
-      {/* <TextEditor /> */}
+      <Navbar setOption={setOption} />
+      {option === "signup" ? <Signup /> : null}
+      {option === "login" ? <Login /> : null}
+      {option === "texteditor" ? <TextEditor /> : null}
     </>
   );
 }
