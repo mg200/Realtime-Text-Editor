@@ -1,15 +1,16 @@
 import { useState } from "react";
 import axios from "axios";
-import TextEditor from "../src/components/textEditor";
-import Login from "./components/login";
 import Signup from "./components/signup";
 import Navbar from "../src/components/navbar";
+import Document from "./components/Document"; 
+import TextEditor from './components/textEditor'; 
 
 function App() {
   return (
     <>
       <Navbar />
-      <TextEditor />
+      <Document />
+      {/* <TextEditor /> */}
     </>
   );
 }

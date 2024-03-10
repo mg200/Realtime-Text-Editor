@@ -2,7 +2,7 @@ import { useState } from "react";
 import axios from "axios";
 import AlertBox from "./alretBox";
 
-export default function signup() {
+export default function Signup() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [firstName, setFirstName] = useState("");
