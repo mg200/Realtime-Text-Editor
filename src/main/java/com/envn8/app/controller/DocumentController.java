@@ -9,8 +9,8 @@ import com.envn8.app.models.User;
 import com.envn8.app.service.DocumentService;
 import com.envn8.app.service.userService;
 
-import java.util.List;
-import java.util.Map;
+// import java.util.List;
+// import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -117,7 +117,8 @@ public class DocumentController {
             User userToShareWith = userService.getUserByUsername(shareRequest.getUsername());
             document.getSharedWith().add(userToShareWith);
             document.getPermissions().put(userToShareWith.getId(), shareRequest.getPermission());
-            Documents updatedDocument = documentService.updateDocument(document);
+            // to save new sharedWith and permissions
+            Documents updatedDocument = documentService.updateDocument(document); 
             return new ResponseEntity<>(updatedDocument, HttpStatus.OK);
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);

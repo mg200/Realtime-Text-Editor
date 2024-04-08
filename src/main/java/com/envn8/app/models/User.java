@@ -20,12 +20,14 @@ public class User {
     private String password;
     @DBRef
     private List<Documents> documents; // This represents the documents that the user owns
-
+    private List<Documents> sharedDocuments; // This represents the documents that are shared with the user
     public User(){}
     
     public User(String username, String password) {
         this.username = username;
         this.password = password;
+        this.documents = null;
+        this.sharedDocuments = null;
     }
 
     public String getId() {
@@ -73,6 +75,12 @@ public class User {
 
     public void setDocuments(List<Documents> documents) {
         this.documents = documents;
+    }
+    public List<Documents> getSharedDocuments() {
+        return sharedDocuments;
+    }
+    public void setSharedDocuments(List<Documents> sharedDocuments) {
+        this.sharedDocuments = sharedDocuments;
     }
     @Override
     public String toString() {
