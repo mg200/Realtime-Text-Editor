@@ -1,7 +1,14 @@
 package com.envn8.app.models;
+
+import org.springframework.data.mongodb.core.mapping.DBRef;
+
+import java.util.List;
+import java.util.Map;
+
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
+
 @Document
 public class Documents {
     @Id
@@ -10,33 +17,78 @@ public class Documents {
     private String title;
     @Field
     private String content;
-    public Documents(){}
-    public Documents(String title, String content) {
+    @Field
+    private String type;
+    @DBRef
+    private User owner;
+    private List<User> sharedWith; // This represents the users that the document is shared with
+    private Map<String, String> permissions; // This represents the permissions of the shared users
+    // key is the user id and value is the permission level
+
+    public Documents() {
+    }
+
+    public Documents(String title, String content, String type, User owner) {
         this.title = title;
         this.content = content;
+        this.owner = owner;
+        this.type = type;
+        this.sharedWith = null;
+        this.permissions = null;
     }
+
     public String getId() {
         return id;
     }
+
     public void setId(String id) {
         this.id = id;
     }
+
     public String getTitle() {
         return title;
     }
-    public void setTitle(String newtitle)
-    {
+
+    public void setTitle(String newtitle) {
         this.title = newtitle;
     }
+
     public String getContent() {
         return content;
     }
-    public void setContent(String newcontent)
-    {
+
+    public void setContent(String newcontent) {
         this.content = newcontent;
     }
-    // @Override
-    // public String toString() {
-    //     return String.format("Document[id='%s',title='%s',content='%s']", id,title,content);
-    // } 
+
+    public User getOwner() {
+        return owner;
+    }
+
+    public void setOwner(User user) {
+        this.owner = user;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String newtype) {
+        this.type = newtype;
+    }
+    public List<User> getSharedWith() {
+        return sharedWith;
+    }
+
+    public void setSharedWith(List<User> sharedWith) {
+        this.sharedWith = sharedWith;
+    }
+
+    public Map<String, String> getPermissions() {
+        return permissions;
+    }
+
+    public void setPermissions(Map<String, String> permissions) {
+        this.permissions = permissions;
+    }
 }

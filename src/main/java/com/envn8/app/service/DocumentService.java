@@ -13,6 +13,7 @@ public class DocumentService {
     public DocumentService(DocumentRepository documentRepository) {
         this.documentRepository = documentRepository;
     }
+
     // Create
     public Documents createDocument(Documents document) {
         return documentRepository.save(document);
@@ -25,6 +26,7 @@ public class DocumentService {
 
     // Update
     public Documents updateDocument(Documents document) {
+        // This method now also updates the sharedWith and permissions fields of a document
         return documentRepository.save(document);
     }
 
@@ -33,4 +35,8 @@ public class DocumentService {
         documentRepository.deleteById(id);
     }
 
+    // Rename
+    public Documents renameDocument(Documents document) {
+        return documentRepository.save(document);
+    }
 }
