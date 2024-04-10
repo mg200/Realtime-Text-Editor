@@ -1,0 +1,23 @@
+mvn clean install
+
+mvn clean install -DskipTests
+
+mvn help:effective-pom
+
+mvn clean dependency:tree
+
+mvn clean compile
+
+cd E:\Spring2024\sprBootProject\demo
+
+
+
+
+
+list of changes we've made:
+
+changed the WebSecurityConfigurerAdapter 
+
+
+
+

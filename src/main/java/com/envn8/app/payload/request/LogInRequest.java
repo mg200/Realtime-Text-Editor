@@ -1,4 +1,4 @@
-package com.envn8.app.service;
+package com.envn8.app.payload.request;
 import jakarta.validation.constraints.NotBlank;
 
 public class LogInRequest {

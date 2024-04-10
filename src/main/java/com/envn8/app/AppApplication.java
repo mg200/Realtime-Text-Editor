@@ -7,6 +7,9 @@ import org.springframework.boot.CommandLineRunner;
 import com.envn8.app.repository.UserRepository;
 import com.envn8.app.models.User;
 
+
+
+
 @SpringBootApplication
 public class AppApplication implements CommandLineRunner{
 
@@ -34,7 +37,10 @@ private UserRepository userRepository = null;
 
 		for(User user :userRepository.findAll()){
 			System.out.println(user);
+			System.out.println("Hello it's Me!");
 
 		}
+		//write code about how to read input from the front end
+		
 	}
 }
