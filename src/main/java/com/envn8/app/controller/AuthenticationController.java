@@ -102,6 +102,20 @@ public class AuthenticationController {
         User user = new User(signUpRequest.getUsername(), 
                              encoder.encode(signUpRequest.getPassword()));
     
+                             
+        user.setFirstName(signUpRequest.getFirstName());
+        user.setLastName(signUpRequest.getLastName());
+        user.setEmail(signUpRequest.getEmail());
+        user.setPassword(signUpRequest.getPassword());    
+        userRepository.save(user);
+        
+        //print the received username, password, firstName, lastName, email
+        System.out.println("Username: " + signUpRequest.getUsername());
+        System.out.println("Password: " + signUpRequest.getPassword());
+        // System.out.println("First Name: " + signUpRequest.getFirstName());
+        // System.out.println("Last Name: " + signUpRequest.getLastName());
+        System.out.println("Email: " + signUpRequest.getEmail());
+
         // Set<String> strRoles = signUpRequest.getRoles();
         // Set<Role> roles = new HashSet<>();
     
@@ -133,9 +147,9 @@ public class AuthenticationController {
         // }
     
         // user.setRoles(roles);
-        userRepository.save(user);
+
     
-        return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
+        return ResponseEntity.ok(new MessageResponse("Man, User registered successfully!"));
       }
     }
     
