@@ -67,6 +67,9 @@ public class AuthenticationController {
         Authentication authentication = authenticationManager.authenticate(
             new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
     System.out.println("In here, Authentication: " + authentication);
+    System.out.println("Username is " + loginRequest.getUsername());
+    System.out.println("Password is " + loginRequest.getPassword());
+    // System.out.println("-*******************************\n-QQQQQQQQQQQQQQQQQQQQQQQQQQQQ\n******************************\n");
         SecurityContextHolder.getContext().setAuthentication(authentication);
     
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();

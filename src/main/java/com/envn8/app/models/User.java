@@ -1,6 +1,7 @@
 package com.envn8.app.models;
+import java.util.HashSet;
 import java.util.List;
-// import java.util.Set;
+import java.util.Set;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -35,6 +36,10 @@ public class User {
     @Size(max = 50)
     @Email
     private String email;
+    
+    @DBRef
+    private Set<Role> roles = new HashSet<>();
+
     /**
      * Represents the documents that the user owns.
      */
@@ -120,4 +125,12 @@ public class User {
     public String toString() {
         return String.format("User[id='%s',firstname='%s',lastName='%s', password='%s']", id, firstName, lastName,password);
     }
+
+    public Set<Role> getRoles() {
+        return roles;
+      }
+    
+      public void setRoles(Set<Role> roles) {
+        this.roles = roles;
+      }
 }

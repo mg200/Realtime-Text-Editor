@@ -41,7 +41,7 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        System.out.println("SecurityConfig.filterChain");
+        // System.out.println("SecurityConfig.filterChain");
         http
                 .csrf().disable()
                 .exceptionHandling()

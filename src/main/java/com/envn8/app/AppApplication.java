@@ -37,7 +37,7 @@ private UserRepository userRepository = null;
 
 		for(User user :userRepository.findAll()){
 			System.out.println(user);
-			System.out.println("Hello it's Me!");
+			// System.out.println("Hello it's Me!");
 
 		}
 		//write code about how to read input from the front end

@@ -1,4 +1,5 @@
 package com.envn8.app.payload.request;
+import java.util.Set;
 import jakarta.validation.constraints.*;
 public class SignUpRequest {
     @NotBlank
@@ -15,6 +16,8 @@ public class SignUpRequest {
     @Size(min = 8, max = 40)
     @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).*$")
     private String password;
+
+  private Set<String> roles;
 
 
   @NotBlank
@@ -58,5 +61,13 @@ public class SignUpRequest {
       }
       public void setLastName(String lastName){
         this.lastName = lastName;
+      }
+
+      public Set<String> getRoles() {
+        return this.roles;
+      }
+    
+      public void setRole(Set<String> roles) {
+        this.roles = roles;
       }
     }
