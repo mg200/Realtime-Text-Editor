@@ -66,7 +66,7 @@ public class AuthenticationController {
 
         Authentication authentication = authenticationManager.authenticate(
             new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
-    
+    System.out.println("In here, Authentication: " + authentication);
         SecurityContextHolder.getContext().setAuthentication(authentication);
     
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
@@ -108,7 +108,7 @@ public class AuthenticationController {
         user.setEmail(signUpRequest.getEmail());
         user.setPassword(signUpRequest.getPassword());    
         userRepository.save(user);
-        
+
         //print the received username, password, firstName, lastName, email
         System.out.println("Username: " + signUpRequest.getUsername());
         System.out.println("Password: " + signUpRequest.getPassword());
