@@ -40,6 +40,9 @@ public class User {
     @DBRef
     private Set<Role> roles = new HashSet<>();
 
+    //encoded password, stored in the database for demonstration purposes but not returned to the client
+    //should be deleted later 
+    private String encodedPassword;
     /**
      * Represents the documents that the user owns.
      */
@@ -91,6 +94,10 @@ public class User {
 
     public String getPassword() {
         return password;
+    }
+
+    public String getEncodedPassword() {
+        return encodedPassword;
     }
 
     public void setPassword(String password) {

@@ -66,10 +66,11 @@ public class AuthenticationController {
 
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
-        System.out.println("In here, Authentication: " + authentication);
-        System.out.println("Username is " + loginRequest.getUsername());
-        System.out.println("Password is " + loginRequest.getPassword());
-        System.out.println("-**************************************************************\n-QQQQQQQQQQQQQQQQQQQQQQQQQQQQ\n******************************\n");
+        // System.out.println("In here, Authentication: " + authentication);
+        // System.out.println("Username is " + loginRequest.getUsername());
+        // System.out.println("Password is " + loginRequest.getPassword());
+        // System.out.println(
+        //         "-**************************************************************\n-QQQQQQQQQQQQQQQQQQQQQQQQQQQQ\n******************************\n");
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
@@ -129,17 +130,21 @@ public class AuthenticationController {
         user.setLastName(signUpRequest.getLastName());
         user.setEmail(signUpRequest.getEmail());
         user.setPassword(encoder.encode(signUpRequest.getPassword()));
-        userRepository.save(user);
-        //some logs
-        // print the received username, password, firstName, lastName, email
-        // System.out.println("Username: " + signUpRequest.getUsername());
-        // System.out.println("Password: " + signUpRequest.getPassword());
-        // System.out.println("First Name: " + signUpRequest.getFirstName());
-        // System.out.println("Last Name: " + signUpRequest.getLastName());
-        // System.out.println("Email: " + signUpRequest.getEmail());
+        // user.setRoles(signUpRequest.getRoles());
 
+        /*
+         * 
+         * // some logs
+         * print the received username, password, firstName, lastName, email
+         * System.out.println("Username: " + signUpRequest.getUsername());
+         * System.out.println("Password: " + signUpRequest.getPassword());
+         * System.out.println("First Name: " + signUpRequest.getFirstName());
+         * System.out.println("Last Name: " + signUpRequest.getLastName());
+         * System.out.println("Email: " + signUpRequest.getEmail());
+         * 
+         */
 
-
+        // Role Handling code is commented out
         // Set<String> strRoles = signUpRequest.getRoles();
         // Set<Role> roles = new HashSet<>();
 
@@ -171,7 +176,7 @@ public class AuthenticationController {
         // }
 
         // user.setRoles(roles);
-
+        userRepository.save(user);
         return ResponseEntity.ok(new MessageResponse("Man, User registered successfully!"));
     }
 }
