@@ -35,7 +35,6 @@ public class AppApplication implements CommandLineRunner {
 			// System.out.println("Hello it's Me!");
 
 		}
-		// write code about how to read input from the front end
 
 	}
 }
