@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { SiMdnwebdocs } from "react-icons/si";
 import { FaThList } from "react-icons/fa";
 import { IoMdLogIn } from "react-icons/io";
@@ -6,6 +6,12 @@ import { FaSignInAlt } from "react-icons/fa";
 import { RiFileEditFill } from "react-icons/ri";
 
 export default function Navbar({ setOption }) {
+  // check is loged in or not ?
+  // const [isLogedIn, setIslogedIn] = useState();
+  // const [loged, setLoged] = useState(false);
+  // useEffect(() => {
+  //   localStorage.getItem("token");
+  // }, []);
   return (
     <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
       <div className="container-fluid">
