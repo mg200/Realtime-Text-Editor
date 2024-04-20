@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useEditor, EditorContent, EditorProvider } from "@tiptap/react";
 import { Button } from "react-bootstrap";
 import { BiHeading, BiBold, BiItalic, BiStrikethrough } from "react-icons/bi";
@@ -42,8 +42,19 @@ const TextEditor = () => {
   const editor = useEditor({
     extensions: extensions,
     content: content,
+    onUpdate: ({ editor }) => {
+      content = editor.getJSON();
+      console.log(content);
+      sendContentToServer(content);
+    },
   });
-
+  useEffect(() => {
+    const unsubscribe = RecieveFromServer((content) => {
+      editor.commands.setContent(content);
+    });
+    // Clean up the listener when the component is unmounted/deleted
+    return unsubscribe;
+  }, [editor]);
   return (
     <div className="container border mt-4 vh-100 w-50">
       <MenuBar editor={editor} />
@@ -51,7 +62,31 @@ const TextEditor = () => {
     </div>
   );
 };
+let ws = new WebSocket('ws://localhost:8000/ws'); 
+function sendContentToServer(content) {
+  const message = {
+    type: 'edit',
+    content: content,
+    userId: userId, //// TODO: Add the userId here
+  };
+  ws.send(JSON.stringify(message));
+}
 
+function RecieveFromServer(callback) {
+  // Set up a listener for updates from the server
+  ws.onopen = () => {
+  ws.onmessage = (event) => {
+    const message = JSON.parse(event.data);
+    if (message.type === 'edit') {
+      callback(message.content);
+    }
+  };
+  };
+  // Return a function that removes the listener
+  return () => {
+    ws.onmessage = null;
+  };
+}
 export default TextEditor;
 
 const MenuBar = ({ editor }) => {
