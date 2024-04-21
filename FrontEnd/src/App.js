@@ -1,4 +1,5 @@
 import { useState } from "react";
+import Login from "./components/login";
 import axios from "axios";
 import Signup from "./components/signup";
 import Navbar from "../src/components/navbar";
@@ -12,7 +13,7 @@ function App() {
       <Navbar setOption={setOption} />
       {option === "signup" ? <Signup /> : null}
       {option === "login" ? <Login /> : null}
-      {option === "texteditor" ? <TextEditor /> : null}
+    
     </>
   );
 }

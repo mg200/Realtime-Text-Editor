@@ -16,10 +16,10 @@ export default function Login() {
       }
 
       const user = {
-        email: email,
+        username: email,
         password: password,
       };
-      const res = await axios.post("http://localhost:3001/login", user);
+      const res = await axios.post("http://localhost:8000/api/auth/signin", user);
       console.log(res.data);
 
       if (!res) {

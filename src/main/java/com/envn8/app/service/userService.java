@@ -30,4 +30,9 @@ public class userService {
     // public User getUserByEmail(String email) {
     //     return userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("User not found"));
     // }
+
+    public String forgetPassword(String username) {
+        User user = userRepository.findByUsername(username).orElseThrow(() -> new RuntimeException("User not found"));
+        return "Password reset link sent to your email";
+    }
 }

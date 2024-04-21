@@ -20,7 +20,7 @@ export default function Signup() {
         email: email,
         password: password,
       };
-      const res = await axios.post("http://localhost:3001/signup", user);
+      const res = await axios.post("http://localhost:8000/api/auth/signup", user);
       console.log(res.data);
 
       if (!res.ok) {
