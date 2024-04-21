@@ -63,14 +63,6 @@ public class AuthenticationController {
                 // this.jwtGenerator = jwtGenerator;
         }
 
-        // @PutMapping("/forget-password")
-        // public ResponseEntity<?> forgetPassword(@RequestParam String username){
-        // User user = userRepository.findByUsername(username).orElseThrow(() -> new
-        // RuntimeException("User not found"));
-        // return ResponseEntity.ok(new MessageResponse("Password reset link sent to
-        // your email"));
-        // }
-
         @PostMapping("/signin")
         public ResponseEntity<?> authenticateUser(@Valid @RequestBody LogInRequest loginRequest) {
 
