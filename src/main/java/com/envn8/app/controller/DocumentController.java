@@ -178,4 +178,8 @@ public class DocumentController {
             this.permission = permission;
         }
     }
+
+    // //view all and view all shared documents
+    // @GetMapping("/documents")
+    
 }
