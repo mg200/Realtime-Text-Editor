@@ -18,10 +18,10 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
+// import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+// import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.envn8.app.models.User;
@@ -63,6 +63,8 @@ public class AuthenticationController {
                 // this.jwtGenerator = jwtGenerator;
         }
 
+        // curl -X POST -H "Content-Type: application/json" -d "{\"username\":\"jimmy\",
+        // \"password\":\"Jamjam123\"}" http://localhost:8000/api/auth/signin
         @PostMapping("/signin")
         public ResponseEntity<?> authenticateUser(@Valid @RequestBody LogInRequest loginRequest) {
 
@@ -87,10 +89,12 @@ public class AuthenticationController {
         }
 
         // @PostMapping("/getRole")
-        // public ResponseEntity<?> getRole(@Valid @RequestBody LogInRequest loginRequest) {
-    
-        //     Authentication authentication = authenticationManager.authenticate(
-        //             new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
+        // public ResponseEntity<?> getRole(@Valid @RequestBody LogInRequest
+        // loginRequest) {
+
+        // Authentication authentication = authenticationManager.authenticate(
+        // new UsernamePasswordAuthenticationToken(loginRequest.getUsername(),
+        // loginRequest.getPassword()));
 
         @PostMapping("/signup")
         public ResponseEntity<?> registerUser(@Valid @RequestBody SignUpRequest signUpRequest) {
@@ -183,6 +187,50 @@ public class AuthenticationController {
                 // user.setRoles(roles);
                 userRepository.save(user);
                 return ResponseEntity.ok(new MessageResponse("Man, User registered successfully!"));
+        }
+
+        @PostMapping("/change-password")
+        public ResponseEntity<?> changePassword(@Valid @RequestBody PasswordChangeRequest requestUtil) {
+                // User user =
+                // userRepository.findByUsername(requestUtil.getUsername()).orElseThrow(() ->
+                // new RuntimeException("User not found"));
+                // log out the requestUtil properties
+                System.out.println("*** Password Change Request ***");
+                System.out.println("Username: " + requestUtil.getUsername());
+                System.out.println("Old Password: " + requestUtil.getOldpassword());
+                System.out.println("New Password: " + requestUtil.getNewpassword());
+                System.out.println("New Password2: " + requestUtil.getNewpassword2());
+                System.out.println(requestUtil);
+
+                Authentication authentication = authenticationManager.authenticate(
+                                new UsernamePasswordAuthenticationToken(requestUtil.getUsername(),
+                                                requestUtil.getOldpassword()));
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+                UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+                ResponseCookie jwtCookie = jwtUtils.generateJwtCookie(userDetails);
+
+                if (!requestUtil.getNewpassword().equals(requestUtil.getNewpassword2())) {
+                        return ResponseEntity.badRequest()
+                                        .body(new MessageResponse("Error: New passwords do not match!"));
+                }
+
+                if (requestUtil.getNewpassword().length() < 8) {
+                        return ResponseEntity.badRequest()
+                                        .body(new MessageResponse(
+                                                        "Error: Password must be at least 8 characters long!"));
+                }
+
+                if (!requestUtil.getNewpassword().matches("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).*$")) {
+                        return ResponseEntity.badRequest().body(new MessageResponse(
+                                        "Error: Password must contain at least one uppercase letter, one lowercase letter, and one number!"));
+                }
+
+                User user = userRepository.findByUsername(requestUtil.getUsername())
+                                .orElseThrow(() -> new RuntimeException("User not found"));
+                user.setPassword(encoder.encode(requestUtil.getNewpassword()));
+                userRepository.save(user);
+                return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
+                                .body(new MessageResponse("Password changed successfully!"));
         }
 
 }
