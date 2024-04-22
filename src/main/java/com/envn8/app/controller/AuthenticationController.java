@@ -1,8 +1,8 @@
 package com.envn8.app.controller;
 
-// import java.util.HashSet;
+import java.util.HashSet;
 import java.util.List;
-// import java.util.Set;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import jakarta.validation.Valid;
@@ -24,6 +24,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 // import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.envn8.app.models.ERole;//added 22/4
+import com.envn8.app.models.Role;//added 22/4
 import com.envn8.app.models.User;
 import com.envn8.app.payload.request.LogInRequest;
 import com.envn8.app.payload.response.MessageResponse;
@@ -32,6 +34,8 @@ import com.envn8.app.payload.request.*;
 import com.envn8.app.service.UserDetailsImpl;
 import com.envn8.app.security.jwt.JwtUtils;
 import com.envn8.app.payload.response.UserInfoResponse;
+
+import com.envn8.app.repository.RoleRepository;//added 22/4
 // import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 
 //import AuthenticationManagerBuilder
@@ -48,6 +52,8 @@ public class AuthenticationController {
 
         @Autowired
         UserRepository userRepository;
+        @Autowired
+        RoleRepository roleRepository;
         @Autowired
         PasswordEncoder encoder;
         @Autowired
@@ -88,13 +94,6 @@ public class AuthenticationController {
                                                 roles));
         }
 
-        // @PostMapping("/getRole")
-        // public ResponseEntity<?> getRole(@Valid @RequestBody LogInRequest
-        // loginRequest) {
-
-        // Authentication authentication = authenticationManager.authenticate(
-        // new UsernamePasswordAuthenticationToken(loginRequest.getUsername(),
-        // loginRequest.getPassword()));
 
         @PostMapping("/signup")
         public ResponseEntity<?> registerUser(@Valid @RequestBody SignUpRequest signUpRequest) {
@@ -139,69 +138,49 @@ public class AuthenticationController {
                 user.setLastName(signUpRequest.getLastName());
                 user.setEmail(signUpRequest.getEmail());
                 user.setPassword(encoder.encode(signUpRequest.getPassword()));
-                // user.setRoles(signUpRequest.getRoles());
-
-                /*
-                 * 
-                 * // some logs
-                 * print the received username, password, firstName, lastName, email
-                 * System.out.println("Username: " + signUpRequest.getUsername());
-                 * System.out.println("Password: " + signUpRequest.getPassword());
-                 * System.out.println("First Name: " + signUpRequest.getFirstName());
-                 * System.out.println("Last Name: " + signUpRequest.getLastName());
-                 * System.out.println("Email: " + signUpRequest.getEmail());
-                 * 
-                 */
+                // user.setRoles(roles);
 
                 // Role Handling code is commented out
-                // Set<String> strRoles = signUpRequest.getRoles();
-                // Set<Role> roles = new HashSet<>();
+                Set<String> strRoles = signUpRequest.getRoles();
+                Set<Role> roles = new HashSet<>();
 
-                // if (strRoles == null) {
-                // Role userRole = roleRepository.findByName(ERole.ROLE_USER)
-                // .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
-                // roles.add(userRole);
-                // } else {
-                // strRoles.forEach(role -> {
-                // switch (role) {
-                // case "admin":
-                // Role adminRole = roleRepository.findByName(ERole.ROLE_ADMIN)
-                // .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
-                // roles.add(adminRole);
+                if (strRoles == null) {
+                        Role userRole = roleRepository.findByName(ERole.ROLE_USER)
+                                        .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+                        roles.add(userRole);
+                } else {
+                        strRoles.forEach(role -> {
+                                switch (role) {
+                                        case "admin":
+                                                Role adminRole = roleRepository.findByName(ERole.ROLE_ADMIN)
+                                                                .orElseThrow(() -> new RuntimeException(
+                                                                                "Error: Role is not found."));
+                                                roles.add(adminRole);
 
-                // break;
-                // case "mod":
-                // Role modRole = roleRepository.findByName(ERole.ROLE_MODERATOR)
-                // .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
-                // roles.add(modRole);
+                                                break;
+                                        case "mod":
+                                                Role modRole = roleRepository.findByName(ERole.ROLE_MODERATOR)
+                                                                .orElseThrow(() -> new RuntimeException(
+                                                                                "Error: Role is not found."));
+                                                roles.add(modRole);
 
-                // break;
-                // default:
-                // Role userRole = roleRepository.findByName(ERole.ROLE_USER)
-                // .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
-                // roles.add(userRole);
-                // }
-                // });
-                // }
+                                                break;
+                                        default:
+                                                Role userRole = roleRepository.findByName(ERole.ROLE_USER)
+                                                                .orElseThrow(() -> new RuntimeException(
+                                                                                "Error: Role is not found."));
+                                                roles.add(userRole);
+                                }
+                        });
+                }
 
-                // user.setRoles(roles);
+                user.setRoles(roles);
                 userRepository.save(user);
-                return ResponseEntity.ok(new MessageResponse("Man, User registered successfully!"));
+                return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
         }
 
         @PostMapping("/change-password")
         public ResponseEntity<?> changePassword(@Valid @RequestBody PasswordChangeRequest requestUtil) {
-                // User user =
-                // userRepository.findByUsername(requestUtil.getUsername()).orElseThrow(() ->
-                // new RuntimeException("User not found"));
-                // log out the requestUtil properties
-                System.out.println("*** Password Change Request ***");
-                System.out.println("Username: " + requestUtil.getUsername());
-                System.out.println("Old Password: " + requestUtil.getOldpassword());
-                System.out.println("New Password: " + requestUtil.getNewpassword());
-                System.out.println("New Password2: " + requestUtil.getNewpassword2());
-                System.out.println(requestUtil);
-
                 Authentication authentication = authenticationManager.authenticate(
                                 new UsernamePasswordAuthenticationToken(requestUtil.getUsername(),
                                                 requestUtil.getOldpassword()));
@@ -212,6 +191,10 @@ public class AuthenticationController {
                 if (!requestUtil.getNewpassword().equals(requestUtil.getNewpassword2())) {
                         return ResponseEntity.badRequest()
                                         .body(new MessageResponse("Error: New passwords do not match!"));
+                }
+
+                if(requestUtil.getNewpassword().equals(requestUtil.getOldpassword())){
+                        return ResponseEntity.badRequest().body(new MessageResponse("Enter a new Password!"));
                 }
 
                 if (requestUtil.getNewpassword().length() < 8) {
