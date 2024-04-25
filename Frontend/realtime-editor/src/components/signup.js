@@ -15,7 +15,9 @@ export default function Signup() {
   async function handleSubmit(values, { setSubmitting }) {
     try {
       const res = await axios.post("http://localhost:3001/signup", values);
-      console.log(res.data);
+      const { token } = res.data;
+      localStorage.setItem("token", token);
+      console.log("Token saved in localStorage:", token);
     } catch (error) {
       console.error("Error:", error);
     }
