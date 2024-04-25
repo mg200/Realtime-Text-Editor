@@ -6,17 +6,19 @@ import AlertBox from "./alretBox";
 
 export default function Login() {
   const validationSchema = Yup.object().shape({
-    email: Yup.string()
-      .email("Invalid email format")
-      .required("Email is required"),
+    username: Yup.string().required("username is required"),
     password: Yup.string()
       .min(6, "Password must be at least 6 characters")
       .required("Password is required"),
   });
 
   async function handleSubmit(values, { setSubmitting }) {
+    console.log(values);
     try {
-      const res = await axios.post("http://localhost:3001/login", values);
+      const res = await axios.post(
+        "http://localhost:3001/api/auth/signin",
+        values
+      );
       console.log(res.data);
     } catch (error) {
       console.error("Error:", error);
@@ -40,7 +42,7 @@ export default function Login() {
               <div className="card-body py-5 px-md-5">
                 <Formik
                   initialValues={{
-                    email: "",
+                    username: "",
                     password: "",
                   }}
                   validationSchema={validationSchema}
@@ -49,15 +51,15 @@ export default function Login() {
                   {({ isSubmitting }) => (
                     <Form>
                       <div className="form-outline mb-4">
-                        <label className="form-label" htmlFor="email">
-                          Email address
+                        <label className="form-label" htmlFor="text">
+                          username
                         </label>
                         <Field
-                          type="email"
-                          name="email"
+                          type="username"
+                          name="username"
                           className="form-control"
                         />
-                        <ErrorMessage name="email" component={AlertBox} />
+                        <ErrorMessage name="username" component={AlertBox} />
                       </div>
                       <div className="form-outline mb-4">
                         <label className="form-label" htmlFor="password">

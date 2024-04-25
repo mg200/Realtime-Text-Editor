@@ -6,6 +6,7 @@ const validationSchema = Yup.object().shape({
   firstName: Yup.string().required("First Name is required"),
   lastName: Yup.string().required("Last Name is required"),
   email: Yup.string().email("Invalid email").required("Email is required"),
+  username: Yup.string().required("username is required"),
   password: Yup.string()
     .min(6, "Password must be at least 6 characters")
     .required("Password is required"),
@@ -13,8 +14,12 @@ const validationSchema = Yup.object().shape({
 
 export default function Signup() {
   async function handleSubmit(values, { setSubmitting }) {
+    console.log(values);
     try {
-      const res = await axios.post("http://localhost:3001/signup", values);
+      const res = await axios.post(
+        "http://localhost:3001/api/auth/signup",
+        values
+      );
       console.log(res.data);
     } catch (error) {
       console.error("Error:", error);
@@ -40,6 +45,7 @@ export default function Signup() {
                     firstName: "",
                     lastName: "",
                     email: "",
+                    username: "",
                     password: "",
                   }}
                   validationSchema={validationSchema}
@@ -69,6 +75,17 @@ export default function Signup() {
                           className="form-control"
                         />
                         <ErrorMessage name="lastName" component={AlertBox} />
+                      </div>
+                      <div className="form-outline mb-4">
+                        <label htmlFor="firstName" className="form-label">
+                          username
+                        </label>
+                        <Field
+                          type="text"
+                          name="username"
+                          className="form-control"
+                        />
+                        <ErrorMessage name="username" component={AlertBox} />
                       </div>
 
                       <div className="form-outline mb-4">

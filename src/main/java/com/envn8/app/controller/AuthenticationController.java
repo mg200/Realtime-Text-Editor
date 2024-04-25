@@ -64,6 +64,8 @@ public class AuthenticationController {
     @PostMapping("/signin")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LogInRequest loginRequest) {
 
+System.out.println(
+                "-**************************************************************\n-QQQQQQQQQQQQQQQQQQQQQQQQQQQQ\n******************************\n");
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
         // System.out.println("In here, Authentication: " + authentication);
