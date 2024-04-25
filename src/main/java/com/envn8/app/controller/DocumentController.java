@@ -125,6 +125,54 @@ public class DocumentController {
         }
     }
 
+
+    @PostMapping("/dc/create")
+    public ResponseEntity<Documents> createDocument_temp(@RequestBody DocumentRequest documentRequest,
+            @RequestHeader("username") String username) {
+        System.out.println(
+                "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^Usr info:^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
+        User user = userService.getUserByUsername(username); // Get the user who is creating the document
+        // print user info
+        System.out.println("User info: " + user);
+        Documents document = new Documents();
+        document.setContent(documentRequest.getContent());
+        document.setTitle(documentRequest.getTitle());
+        document.setType(documentRequest.getType());
+        document.setOwner(user);
+        Documents savedDocument = documentService.createDocument(document);
+        return new ResponseEntity<>(savedDocument, HttpStatus.CREATED);
+    }
+
+    // Open a document
+    @GetMapping("/dc/view/{id}")
+    public ResponseEntity<Documents> viewDocument_temp(@PathVariable String id,
+            @RequestHeader("username") String username) {
+        Optional<Documents> documentOptional = documentService.getDocumentById(id);
+        if (documentOptional.isPresent()) {
+            Documents document = documentOptional.get();
+            if (document.getType().equals("public") || document.getOwner().getUsername().equals(username)
+                    || document.getSharedWith().contains(userService.getUserByUsername(username))) {
+                System.out.println("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^Document info:");
+                        return new ResponseEntity<>(documentOptional.get(), HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+            }
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
+
+    @GetMapping("/dc/sayHello")
+    public void sayHello() {
+        System.out.println("Hello from the server!");
+    }
+
+
+
+
+
+
     static class DocumentRequest {
         private String content;
         private String title;
