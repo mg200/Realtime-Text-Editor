@@ -34,7 +34,7 @@ import com.envn8.app.payload.request.*;
 import com.envn8.app.service.UserDetailsImpl;
 import com.envn8.app.security.jwt.JwtUtils;
 import com.envn8.app.payload.response.UserInfoResponse;
-
+import com.envn8.app.payload.response.TokenResponse;
 import com.envn8.app.repository.RoleRepository;//added 22/4
 // import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 
@@ -69,50 +69,6 @@ public class AuthenticationController {
         // this.jwtGenerator = jwtGenerator;
     }
 
-    @PostMapping("/signin")
-    public ResponseEntity<?> authenticateUser(@Valid @RequestBody LogInRequest loginRequest) {
-
-System.out.println(
-                "-**************************************************************\n-QQQQQQQQQQQQQQQQQQQQQQQQQQQQ\n******************************\n");
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
-        // System.out.println("In here, Authentication: " + authentication);
-        // System.out.println("Username is " + loginRequest.getUsername());
-        // System.out.println("Password is " + loginRequest.getPassword());
-        // System.out.println(
-        //         "-**************************************************************\n-QQQQQQQQQQQQQQQQQQQQQQQQQQQQ\n******************************\n");
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-
-        UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
-
-        ResponseCookie jwtCookie = jwtUtils.generateJwtCookie(userDetails);
-
-        List<String> roles = userDetails.getAuthorities().stream()
-                .map(item -> item.getAuthority())
-                .collect(Collectors.toList());
-
-        return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
-                .body(new UserInfoResponse(userDetails.getId(),
-                        userDetails.getUsername(),
-                        userDetails.getEmail(),
-                        roles));
-    }
-
-    @PostMapping("/signup")
-    public ResponseEntity<?> registerUser(@Valid @RequestBody SignUpRequest signUpRequest) {
-        if (userRepository.existsByUsername(signUpRequest.getUsername())) {
-            return ResponseEntity
-                    .badRequest()
-                    .body(new MessageResponse("Error: Username is already taken!"));
-        @Autowired
-        public AuthenticationController(AuthenticationManager authenticationManager, UserRepository userRepository,
-                        PasswordEncoder passwordEncoder) {
-                this.authenticationManager = authenticationManager;
-                this.userRepository = userRepository;
-                // this.roleRepository = roleRepository;
-                this.encoder = passwordEncoder;
-                // this.jwtGenerator = jwtGenerator;
-        }
 
         // curl -X POST -H "Content-Type: application/json" -d "{\"username\":\"jimmy\",
         // \"password\":\"Jamjam123\"}" http://localhost:8000/api/auth/signin
@@ -127,16 +83,18 @@ System.out.println(
                 UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
 
                 ResponseCookie jwtCookie = jwtUtils.generateJwtCookie(userDetails);
-
+                System.out.println("JWT Cookie is : " + jwtCookie.toString());
                 List<String> roles = userDetails.getAuthorities().stream()
                                 .map(item -> item.getAuthority())
                                 .collect(Collectors.toList());
 
-                return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
-                                .body(new UserInfoResponse(userDetails.getId(),
-                                                userDetails.getUsername(),
-                                                userDetails.getEmail(),
-                                                roles));
+                // return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
+                //                 .body(new UserInfoResponse(userDetails.getId(),
+                //                                 userDetails.getUsername(),
+                //                                 userDetails.getEmail(),
+                //                                 roles, jwtCookie.toString()));
+                String token=jwtCookie.getValue();
+                return ResponseEntity.ok().body(new TokenResponse(token));
         }
 
 
@@ -169,12 +127,12 @@ System.out.println(
                                                         "Error: Password must contain at least one uppercase letter, one lowercase letter, and one number!"));
                 }
 
-                // handle the password and confirm password mismatch
-                if (!signUpRequest.getPassword().equals(signUpRequest.getConfirmPassword())) {
-                        return ResponseEntity
-                                        .badRequest()
-                                        .body(new MessageResponse("Error: Passwords do not match!"));
-                }
+                // // handle the password and confirm password mismatch
+                // if (!signUpRequest.getPassword().equals(signUpRequest.getConfirmPassword())) {
+                //         return ResponseEntity
+                //                         .badRequest()
+                //                         .body(new MessageResponse("Error: Passwords do not match!"));
+                // }
                 // Create new user's account
                 User user = new User(signUpRequest.getUsername(),
                                 encoder.encode(signUpRequest.getPassword()));

@@ -67,7 +67,7 @@ function sendContentToServer(content) {
   const message = {
     type: 'edit',
     content: content,
-    userId: userId, //// TODO: Add the userId here
+    // userId: userId, //// TODO: Add the userId here
   };
   ws.send(JSON.stringify(message));
 }
