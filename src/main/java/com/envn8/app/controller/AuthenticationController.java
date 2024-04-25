@@ -179,7 +179,15 @@ public class AuthenticationController {
 
                 // user.setRoles(roles);
                 userRepository.save(user);
-                return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
+                Authentication authentication = authenticationManager.authenticate(
+                                new UsernamePasswordAuthenticationToken(signUpRequest.getUsername(),
+                                signUpRequest.getPassword()));
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+                UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+
+                ResponseCookie jwtCookie = jwtUtils.generateJwtCookie(userDetails);            
+                String token=jwtCookie.getValue();
+                return ResponseEntity.ok().body(new TokenResponse(token));
         }
 
         @PostMapping("/change-password")

@@ -6,6 +6,7 @@ public class TokenResponse {
     public TokenResponse(String token) {
         this.token = token;
     }
+
     public void setToken(String token) {
         this.token = token;
     }
