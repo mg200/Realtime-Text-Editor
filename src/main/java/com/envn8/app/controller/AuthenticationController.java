@@ -59,51 +59,6 @@ public class AuthenticationController {
         @Autowired
         JwtUtils jwtUtils;
 
-    @Autowired
-    public AuthenticationController(AuthenticationManager authenticationManager, UserRepository userRepository,
-            PasswordEncoder passwordEncoder) {
-        this.authenticationManager = authenticationManager;
-        this.userRepository = userRepository;
-        // this.roleRepository = roleRepository;
-        this.encoder = passwordEncoder;
-        // this.jwtGenerator = jwtGenerator;
-    }
-
-    @PostMapping("/signin")
-    public ResponseEntity<?> authenticateUser(@Valid @RequestBody LogInRequest loginRequest) {
-
-System.out.println(
-                "-**************************************************************\n-QQQQQQQQQQQQQQQQQQQQQQQQQQQQ\n******************************\n");
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
-        // System.out.println("In here, Authentication: " + authentication);
-        // System.out.println("Username is " + loginRequest.getUsername());
-        // System.out.println("Password is " + loginRequest.getPassword());
-        // System.out.println(
-        //         "-**************************************************************\n-QQQQQQQQQQQQQQQQQQQQQQQQQQQQ\n******************************\n");
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-
-        UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
-
-        ResponseCookie jwtCookie = jwtUtils.generateJwtCookie(userDetails);
-
-        List<String> roles = userDetails.getAuthorities().stream()
-                .map(item -> item.getAuthority())
-                .collect(Collectors.toList());
-
-        return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
-                .body(new UserInfoResponse(userDetails.getId(),
-                        userDetails.getUsername(),
-                        userDetails.getEmail(),
-                        roles));
-    }
-
-    @PostMapping("/signup")
-    public ResponseEntity<?> registerUser(@Valid @RequestBody SignUpRequest signUpRequest) {
-        if (userRepository.existsByUsername(signUpRequest.getUsername())) {
-            return ResponseEntity
-                    .badRequest()
-                    .body(new MessageResponse("Error: Username is already taken!"));
         @Autowired
         public AuthenticationController(AuthenticationManager authenticationManager, UserRepository userRepository,
                         PasswordEncoder passwordEncoder) {
