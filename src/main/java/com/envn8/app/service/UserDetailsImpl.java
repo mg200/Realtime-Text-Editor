@@ -1,4 +1,5 @@
 package com.envn8.app.service;
+
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
@@ -7,33 +8,39 @@ import java.util.stream.Collectors;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
+import com.envn8.app.repository.UserRepository; //for change password
 import com.envn8.app.models.User;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 public class UserDetailsImpl implements UserDetails {
 
-    private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1L;
 
-    private String id;
-  
-    private String username;
-  
-    private String email;
-  
-    @JsonIgnore
-    private String password;
-  
-    private Collection<? extends GrantedAuthority> authorities;
-  
-    public UserDetailsImpl(String id, String username, String email, String password, 
-    Collection<? extends GrantedAuthority> authorities) {
-      this.id = id;
-      this.username = username;
-      this.email = email;
-      this.password = password;
-      this.authorities = authorities;
-    }
+  private String id;
+
+  private String username;
+
+  private String email;
+
+  @JsonIgnore
+  private String password;
+
+  // change password
+  private static UserRepository userRepository;
+  private static PasswordEncoder passwordEncoder;
+
+  private Collection<? extends GrantedAuthority> authorities;
+
+  public UserDetailsImpl(String id, String username, String email, String password,
+      Collection<? extends GrantedAuthority> authorities) {
+    this.id = id;
+    this.username = username;
+    this.email = email;
+    this.password = password;
+    this.authorities = authorities;
+  }
 
   public static UserDetailsImpl build(User user) {
     List<GrantedAuthority> authorities = user.getRoles().stream()
@@ -41,10 +48,10 @@ public class UserDetailsImpl implements UserDetails {
         .collect(Collectors.toList());
 
     return new UserDetailsImpl(
-        user.getId(), 
-        user.getUsername(), 
+        user.getId(),
+        user.getUsername(),
         user.getEmail(),
-        user.getPassword(), 
+        user.getPassword(),
         authorities);
 
   }
@@ -101,6 +108,12 @@ public class UserDetailsImpl implements UserDetails {
       return false;
     UserDetailsImpl user = (UserDetailsImpl) o;
     return Objects.equals(id, user.id);
+  }
+
+  // change password
+  public void changePassword(User theUser, String newPassword) {
+    theUser.setPassword(passwordEncoder.encode(newPassword));
+    userRepository.save(theUser);
   }
 
 }

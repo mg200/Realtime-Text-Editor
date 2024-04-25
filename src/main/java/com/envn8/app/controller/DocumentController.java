@@ -3,22 +3,29 @@ package com.envn8.app.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import com.envn8.app.models.Documents;
 import com.envn8.app.models.User;
 import com.envn8.app.service.DocumentService;
 import com.envn8.app.service.userService;
+import org.springframework.messaging.handler.annotation.DestinationVariable;
+import org.springframework.messaging.handler.annotation.Header;
+import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.Payload;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 
 // import java.util.List;
 // import java.util.Map;
 import java.util.Optional;
 
-@RestController
+@Controller
 public class DocumentController {
 
     @Autowired
     private DocumentService documentService;
     private userService userService;
+    private SimpMessagingTemplate messagingTemplate;
 
     @PostMapping("/documents")
     public ResponseEntity<Documents> createDocument(@RequestBody DocumentRequest documentRequest,
@@ -70,25 +77,18 @@ public class DocumentController {
         }
     }
 
-    @PutMapping("/documents/{id}/edit")
-    public ResponseEntity<Documents> editDocument(@PathVariable String id, @RequestBody DocumentRequest documentRequest,
-            @RequestHeader("userId") String userId) {
-        Optional<Documents> documentOptional = documentService.getDocumentById(id); // Get the document by id
-        if (documentOptional.isPresent()) { // If the document exists
+    @MessageMapping("/documents/{id}/edit")
+    public void editDocument(@DestinationVariable String id, @Payload String content, @Header("userId") String userId) {
+        Optional<Documents> documentOptional = documentService.getDocumentById(id);
+        if (documentOptional.isPresent()) {
             Documents document = documentOptional.get();
             String allowedonly = "editor";
-            if (document.getOwner().getId().equals(userId)
-                    || allowedonly.equals(document.getPermissions().get(userId))) {
-                document.setContent(documentRequest.getContent()); // Set the new content
+            if (document.getOwner().getId().equals(userId) || allowedonly.equals(document.getPermissions().get(userId))) {
+                document.setContent(content); /// to be replaced when handling conflicts with OT
                 Documents updatedDocument = documentService.updateDocument(document);
-                // TODO: Notify all clients viewing the document that it has been updated
-                // web socket to be used here
-                return new ResponseEntity<>(updatedDocument, HttpStatus.OK);
-            } else {
-                return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+                // Notify all clients viewing the document that it has been updated
+                messagingTemplate.convertAndSend("/topic/documents/" + id, updatedDocument);
             }
-        } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
 
@@ -178,4 +178,8 @@ public class DocumentController {
             this.permission = permission;
         }
     }
+
+    // //view all and view all shared documents
+    // @GetMapping("/documents")
+    
 }

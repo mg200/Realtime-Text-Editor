@@ -15,10 +15,10 @@ export default function Login() {
   async function handleSubmit(values, { setSubmitting }) {
     console.log(values);
     try {
-      const res = await axios.post(
-        "http://localhost:3001/api/auth/signin",
-        values
-      );
+      const res = await axios.post("http://localhost:3001/login", values);
+      const { token } = res.data;
+      localStorage.setItem("token", token);
+      console.log("Token saved in localStorage:", token);
       console.log(res.data);
     } catch (error) {
       console.error("Error:", error);

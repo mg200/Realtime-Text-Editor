@@ -1,4 +1,5 @@
 package com.envn8.app.models;
+
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -24,24 +25,25 @@ public class User {
     private String lastName;
     @Field
     private String username;
-    
+
     @Field
     @NotBlank
     @Size(min = 8, max = 40)
     @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).*$")
     private String password;
-    
+
     @Field
     @NotBlank
     @Size(max = 50)
     @Email
     private String email;
-    
+
     @DBRef
     private Set<Role> roles = new HashSet<>();
 
-    //encoded password, stored in the database for demonstration purposes but not returned to the client
-    //should be deleted later 
+    // encoded password, stored in the database for demonstration purposes but not
+    // returned to the client
+    // should be deleted later
     private String encodedPassword;
     /**
      * Represents the documents that the user owns.
@@ -130,14 +132,15 @@ public class User {
 
     @Override
     public String toString() {
-        return String.format("User[id='%s',firstname='%s',lastName='%s', password='%s']", id, firstName, lastName,password);
+        return String.format("User[id='%s',firstname='%s',lastName='%s', password='%s']", id, firstName, lastName,
+                password);
     }
 
     public Set<Role> getRoles() {
         return roles;
-      }
-    
-      public void setRoles(Set<Role> roles) {
+    }
+
+    public void setRoles(Set<Role> roles) {
         this.roles = roles;
-      }
+    }
 }
