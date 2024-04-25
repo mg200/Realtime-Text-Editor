@@ -18,10 +18,10 @@ public class SignUpRequest {
   @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).*$")
   private String password;
 
-  @NotBlank
-  @Size(min = 8, max = 40)
-  @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).*$")
-  private String confirmPassword;
+  // @NotBlank
+  // @Size(min = 8, max = 40)
+  // @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).*$")
+  // private String confirmPassword;
   private Set<String> roles;
 
   @NotBlank
@@ -53,13 +53,13 @@ public class SignUpRequest {
     this.password = password;
   }
 
-  public String getConfirmPassword() {
-    return confirmPassword;
-  }
+  // public String getConfirmPassword() {
+  //   return confirmPassword;
+  // }
 
-  public void setConfirmPassword(String confirmPassword) {
-    this.confirmPassword = confirmPassword;
-  }
+  // public void setConfirmPassword(String confirmPassword) {
+  //   this.confirmPassword = confirmPassword;
+  // }
 
   public String getFirstName() {
     return firstName;
