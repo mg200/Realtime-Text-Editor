@@ -26,14 +26,13 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.SecurityConfigurerAdapter;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 
-
-
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
 
     private AuthEntryPointJwt authEntryPoint;
     private UserDetailsService userDetailsService;
+
     @Autowired
     public SecurityConfig(UserDetailsService userDetailsService, AuthEntryPointJwt authEntryPoint) {
         this.userDetailsService = userDetailsService;
@@ -53,10 +52,10 @@ public class SecurityConfig {
                 .and()
                 .authorizeRequests()
                 .requestMatchers(
-            new AntPathRequestMatcher("/api/auth/**"),
-            new AntPathRequestMatcher("/signup"),
-            new AntPathRequestMatcher("/dc/**"))
-            .access("permitAll")
+                        new AntPathRequestMatcher("/api/auth/**"),
+                        new AntPathRequestMatcher("/signup"),
+                        new AntPathRequestMatcher("/dc/**"))
+                .access("permitAll")
                 // .requestMatchers("/api/auth/**").permitAll()
                 // .requestMatchers("/signup").permitAll()
                 // .requestMatchers("/dc/**").permitAll()
@@ -68,56 +67,50 @@ public class SecurityConfig {
         return http.build();
     }
 
-    
     @Bean
     public AuthenticationManager authenticationManager(
             AuthenticationConfiguration authenticationConfiguration) throws Exception {
         return authenticationConfiguration.getAuthenticationManager();
     }
 
-    
     @Bean
     PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
     @Bean
-    public  AuthTokenFilter jwtAuthenticationFilter() {
+    public AuthTokenFilter jwtAuthenticationFilter() {
         return new AuthTokenFilter();
     }
 }
 
-
 // @Configuration
-// // public class SecurityConfig extends SecurityConfigurerAdapter<DefaultSecurityFilterChain, HttpSecurity>{
-//     public class SecurityConfig extends WebSecurityConfiguration{
+// // public class SecurityConfig extends
+// SecurityConfigurerAdapter<DefaultSecurityFilterChain, HttpSecurity>{
+// public class SecurityConfig extends WebSecurityConfiguration{
 
-     
+// @Autowired
+// private AuthenticationConfiguration authenticationConfiguration;
 
-//     @Autowired
-//     private AuthenticationConfiguration authenticationConfiguration;
+// @Autowired
+// private PasswordEncoder passwordEncoder;
 
-//     @Autowired
-//     private PasswordEncoder passwordEncoder;
+// @Bean
+// public AuthenticationManager authenticationManager() throws Exception {
+// return authenticationConfiguration.getAuthenticationManager();
+// }
 
-//     @Bean
-//     public AuthenticationManager authenticationManager() throws Exception {
-//         return authenticationConfiguration.getAuthenticationManager();
-//     }
-    
-
-//         @Override
-//         protected void configure(HttpSecurity httpSecurity) throws Exception {
-//             httpSecurity
-//                     .csrf().disable()
-//                     .authorizeRequests()
-//                     .requestMatchers("/api/auth/**").permitAll()
-//                     .anyRequest().authenticated()
-//                     .and()
-//                     .httpBasic()
-//                     .and()
-//                     .sessionManagement()
-//                     .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-//         }
-//     }
-
+// @Override
+// protected void configure(HttpSecurity httpSecurity) throws Exception {
+// httpSecurity
+// .csrf().disable()
+// .authorizeRequests()
+// .requestMatchers("/api/auth/**").permitAll()
+// .anyRequest().authenticated()
+// .and()
+// .httpBasic()
+// .and()
+// .sessionManagement()
+// .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+// }
+// }
