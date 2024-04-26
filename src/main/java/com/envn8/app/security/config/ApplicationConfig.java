@@ -1,6 +1,5 @@
 package com.envn8.app.security.config;
 
-
 import com.envn8.app.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -24,10 +23,11 @@ public class ApplicationConfig {
 
   @Bean
   public UserDetailsService userDetailsService() {
-    return username -> repository.findByEmail(username)
+    return username -> repository.findByUsername(username)
         .orElseThrow(() -> new UsernameNotFoundException("User not found"));
   }
 
+  // UserDetailsService userDetailsService
   @Bean
   public AuthenticationProvider authenticationProvider() {
     DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();

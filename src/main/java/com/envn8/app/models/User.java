@@ -1,13 +1,14 @@
 package com.envn8.app.models;
 
 import java.util.Collection;
-import java.util.HashSet;
+// import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
+// import java.util.Set;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -35,6 +36,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 public class User implements UserDetails {
 
     @Id
+    @GeneratedValue
     private String id;
     @Field
     private String firstName;
@@ -67,12 +69,13 @@ public class User implements UserDetails {
         // this.sharedDocuments = new java.util.ArrayList<Documents>();
     // }
 
-    public User(String username, String password) {
-        this.username = username;
-        this.password = password;
-        this.documents = new java.util.ArrayList<Documents>();
-        this.sharedDocuments = new java.util.ArrayList<Documents>();
-    }
+    // public User(String username, String password) {
+    //     // this.username = username;
+        
+    //     this.password = password;
+    //     this.documents = new java.util.ArrayList<Documents>();
+    //     this.sharedDocuments = new java.util.ArrayList<Documents>();
+    // }
 
     public String getId() {
         return id;
@@ -98,9 +101,9 @@ public class User implements UserDetails {
         this.lastName = lastName;
     }
 
-    public String getUsername() {
-        return username;
-    }
+    // public String getUsername() {
+    //     return username;
+    // }
 
     public void setUsername(String username) {
         this.username = username;
@@ -146,6 +149,8 @@ public class User implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
+        System.out.println("Role: " + role+"exception here ");
+        System.out.println("Role: " + role.name());
         return List.of(new SimpleGrantedAuthority(role.name()));
     }
 
@@ -167,6 +172,13 @@ public class User implements UserDetails {
     @Override
     public boolean isEnabled() {
         return true;
+    }
+
+    @Override
+    public String getUsername() {
+        // TODO Auto-generated method stub
+        return username;
+        // throw new UnsupportedOperationException("Unimplemented method 'getUsername'");
     }
 
 }
