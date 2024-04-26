@@ -53,13 +53,15 @@ public class User {
     private List<Documents> sharedDocuments; // This represents the documents that are shared with the user
 
     public User() {
+    this.documents = new java.util.ArrayList<Documents>();
+    this.sharedDocuments = new java.util.ArrayList<Documents>();
     }
 
     public User(String username, String password) {
         this.username = username;
         this.password = password;
-        this.documents = null;
-        this.sharedDocuments = null;
+        this.documents = new java.util.ArrayList<Documents>();
+        this.sharedDocuments = new java.util.ArrayList<Documents>();
     }
 
     public String getId() {

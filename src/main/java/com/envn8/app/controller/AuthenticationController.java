@@ -187,6 +187,7 @@ public class AuthenticationController {
 
                 ResponseCookie jwtCookie = jwtUtils.generateJwtCookie(userDetails);            
                 String token=jwtCookie.getValue();
+                System.out.println("token is : " + token);
                 return ResponseEntity.ok().body(new TokenResponse(token));
         }
 

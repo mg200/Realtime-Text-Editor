@@ -110,10 +110,10 @@ public class UserDetailsImpl implements UserDetails {
     return Objects.equals(id, user.id);
   }
 
-  // change password
-  public void changePassword(User theUser, String newPassword) {
-    theUser.setPassword(passwordEncoder.encode(newPassword));
-    userRepository.save(theUser);
-  }
+  // // change password
+  // public void changePassword(User theUser, String newPassword) {
+  //   theUser.setPassword(passwordEncoder.encode(newPassword));
+  //   userRepository.save(theUser);
+  // }
 
 }
