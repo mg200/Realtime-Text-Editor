@@ -15,6 +15,7 @@ import com.envn8.app.service.userService;
 import com.envn8.app.payload.request.DocumentRequest;
 
 @Controller
+//@RequestMapping("/dc")
 public class DocumentHandler_temp {
 
     @Autowired
@@ -53,7 +54,7 @@ public class DocumentHandler_temp {
     // Open a document
     @GetMapping("/dc/view/{id}")
     public ResponseEntity<Documents> viewDocument_temp(@PathVariable String id,
-            @RequestHeader("ِAuthorization") String token) {
+            @RequestHeader("Authorization") String token) {
         System.out.println("hello it's me " + token);
         String actualToken = token.replace("Bearer ", "");
         String username = jwtUtils.getUserNameFromJwtToken(actualToken);
@@ -65,9 +66,11 @@ public class DocumentHandler_temp {
                 System.out.println("***********Document info:************");
                 return new ResponseEntity<>(documentOptional.get(), HttpStatus.OK);
             } else {
+                System.out.println("Forbidden access to document!");
                 return new ResponseEntity<>(HttpStatus.FORBIDDEN);
             }
         } else {
+            System.out.println("Document not found!");
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
@@ -80,19 +83,23 @@ public class DocumentHandler_temp {
         System.out.println("username: " + username + " token: " + actualToken);
         User user = userService.getUserByUsername(username); // Get
         Iterable<Documents> documents = user.getDocuments();
+        //size of documents
+        System.out.println("Size of documents: " + documents.spliterator().getExactSizeIfKnown());
         if (documents != null) {
             for (Documents doc : documents) {
                 System.out.println("Document title: " + doc.getTitle());
             }
+            System.out.println("Documents is not null");
         } else {
             System.out.println("Documents is null");
         }
         System.out.println("log at the end of viewAllDocuments()");
 
+        //return new ResponseEntity<>(documents, HttpStatus.OK);
         return new ResponseEntity<>(documents, HttpStatus.OK);
     }
 
-    @GetMapping("/dc/sayHello")
+    @GetMapping("/sayHello")
     public void sayHello() {
         System.out.println("Hello from the server!");
     }
