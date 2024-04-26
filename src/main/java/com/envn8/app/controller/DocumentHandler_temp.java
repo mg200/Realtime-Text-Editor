@@ -15,7 +15,7 @@ import com.envn8.app.service.userService;
 import com.envn8.app.payload.request.DocumentRequest;
 
 @Controller
-//@RequestMapping("/dc")
+// @RequestMapping("/dc")
 public class DocumentHandler_temp {
 
     @Autowired
@@ -83,7 +83,7 @@ public class DocumentHandler_temp {
         System.out.println("username: " + username + " token: " + actualToken);
         User user = userService.getUserByUsername(username); // Get
         Iterable<Documents> documents = user.getDocuments();
-        //size of documents
+        // size of documents
         System.out.println("Size of documents: " + documents.spliterator().getExactSizeIfKnown());
         if (documents != null) {
             for (Documents doc : documents) {
@@ -95,7 +95,7 @@ public class DocumentHandler_temp {
         }
         System.out.println("log at the end of viewAllDocuments()");
 
-        //return new ResponseEntity<>(documents, HttpStatus.OK);
+        // return new ResponseEntity<>(documents, HttpStatus.OK);
         return new ResponseEntity<>(documents, HttpStatus.OK);
     }
 

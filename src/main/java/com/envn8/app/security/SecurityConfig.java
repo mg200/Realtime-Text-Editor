@@ -21,6 +21,7 @@ import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.DefaultSecurityFilterChain;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.SecurityConfigurerAdapter;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -51,9 +52,14 @@ public class SecurityConfig {
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .authorizeRequests()
-                .requestMatchers("/api/auth/**").permitAll()
-                .requestMatchers("/signup").permitAll()
-                .requestMatchers("/dc/**").permitAll()
+                .requestMatchers(
+            new AntPathRequestMatcher("/api/auth/**"),
+            new AntPathRequestMatcher("/signup"),
+            new AntPathRequestMatcher("/dc/**"))
+            .access("permitAll")
+                // .requestMatchers("/api/auth/**").permitAll()
+                // .requestMatchers("/signup").permitAll()
+                // .requestMatchers("/dc/**").permitAll()
                 // .requestMatchers("/")
                 .anyRequest().authenticated()
                 .and()
@@ -62,6 +68,7 @@ public class SecurityConfig {
         return http.build();
     }
 
+    
     @Bean
     public AuthenticationManager authenticationManager(
             AuthenticationConfiguration authenticationConfiguration) throws Exception {
