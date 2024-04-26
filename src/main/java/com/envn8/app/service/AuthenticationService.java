@@ -28,7 +28,6 @@ public class AuthenticationService {
                 .lastName(request.getLastname())
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
-                .username(request.getUsername())
                 .role(Role.USER)
                 .build();
         repository.save(user);
@@ -38,37 +37,37 @@ public class AuthenticationService {
                 .build();
     }
 
-    // public AuthenticationResponse authenticate(AuthenticationRequest request) {
-    //     System.out.println("inside authenticate email "+request);
-    //     authenticationManager.authenticate(
-    //             new UsernamePasswordAuthenticationToken(
-    //                     request.getEmail(),
-    //                     request.getPassword()));
-    //     var user = repository.findByEmail(request.getEmail())
-    //             .orElseThrow();
-    //     System.out.println("inside authenticate before var"+request.getEmail()+"\n");
-    //     var jwtToken = jwtService.generateToken(user);
-    //     System.out.println("JWT Token: " + jwtToken);
-    //     return AuthenticationResponse.builder()
-    //             .token(jwtToken)
-    //             .build();
-    // }
-
-
     public AuthenticationResponse authenticate(AuthenticationRequest request) {
-        System.out.println("before authenticationManager in username"+request); 
-        System.out.println(""+request.getUsername()+"password "+request.getPassword());   
+        System.out.println("inside authenticate email "+request);
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
-                        request.getUsername(),
+                        request.getEmail(),
                         request.getPassword()));
-        System.out.println("inside authenticate before var"+request.getUsername()+"\n");
-        var user = repository.findByUsername(request.getUsername())
+        var user = repository.findByEmail(request.getEmail())
                 .orElseThrow();
+        System.out.println("inside authenticate before var"+request.getEmail()+"\n");
         var jwtToken = jwtService.generateToken(user);
         System.out.println("JWT Token: " + jwtToken);
         return AuthenticationResponse.builder()
                 .token(jwtToken)
                 .build();
     }
+
+
+    // public AuthenticationResponse authenticate(AuthenticationRequest request) {
+    //     System.out.println("before authenticationManager in username"+request); 
+    //     System.out.println(""+request.getUsername()+"password "+request.getPassword());   
+    //     authenticationManager.authenticate(
+    //             new UsernamePasswordAuthenticationToken(
+    //                     request.getUsername(),
+    //                     request.getPassword()));
+    //     System.out.println("inside authenticate before var"+request.getUsername()+"\n");
+    //     var user = repository.findByUsername(request.getUsername())
+    //             .orElseThrow();
+    //     var jwtToken = jwtService.generateToken(user);
+    //     System.out.println("JWT Token: " + jwtToken);
+    //     return AuthenticationResponse.builder()
+    //             .token(jwtToken)
+    //             .build();
+    // }
 }
