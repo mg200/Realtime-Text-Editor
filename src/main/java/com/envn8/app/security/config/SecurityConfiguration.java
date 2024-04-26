@@ -1,4 +1,4 @@
-package com.envn8.app.security;
+package com.envn8.app.security.config;
 
 
 import jakarta.servlet.Filter;
