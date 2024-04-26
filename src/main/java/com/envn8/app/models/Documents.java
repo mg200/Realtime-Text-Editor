@@ -9,6 +9,8 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @Document
 public class Documents {
     @Id
@@ -19,8 +21,11 @@ public class Documents {
     private String content;
     @Field
     private String type;
+
     @DBRef
+    @JsonIgnore
     private User owner;
+    
     private List<User> sharedWith; // This represents the users that the document is shared with
     private Map<String, String> permissions; // This represents the permissions of the shared users
     // key is the user id and value is the permission level
