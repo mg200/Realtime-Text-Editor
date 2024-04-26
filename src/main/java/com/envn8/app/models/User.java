@@ -1,21 +1,38 @@
 package com.envn8.app.models;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import jakarta.validation.constraints.Pattern;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
+
+@Data
+@Builder
+@NoArgsConstructor //might need to be removed 
+@AllArgsConstructor
+@Entity
 @Document(collection = "users")
-public class User {
+public class User implements UserDetails {
 
     @Id
     private String id;
@@ -38,24 +55,17 @@ public class User {
     @Email
     private String email;
 
-    @DBRef
-    private Set<Role> roles = new HashSet<>();
-
-    // encoded password, stored in the database for demonstration purposes but not
-    // returned to the client
-    // should be deleted later
-    private String encodedPassword;
-    /**
-     * Represents the documents that the user owns.
-     */
+    @Enumerated(EnumType.STRING)
+    private Role role;
+   
     @DBRef
     private List<Documents> documents; // This represents the documents that the user owns
     private List<Documents> sharedDocuments; // This represents the documents that are shared with the user
 
-    public User() {
-    this.documents = new java.util.ArrayList<Documents>();
-    this.sharedDocuments = new java.util.ArrayList<Documents>();
-    }
+    // public User() {
+        // this.documents = new java.util.ArrayList<Documents>();
+        // this.sharedDocuments = new java.util.ArrayList<Documents>();
+    // }
 
     public User(String username, String password) {
         this.username = username;
@@ -100,10 +110,6 @@ public class User {
         return password;
     }
 
-    public String getEncodedPassword() {
-        return encodedPassword;
-    }
-
     public void setPassword(String password) {
         this.password = password;
     }
@@ -138,11 +144,29 @@ public class User {
                 password);
     }
 
-    public Set<Role> getRoles() {
-        return roles;
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return List.of(new SimpleGrantedAuthority(role.name()));
     }
 
-    public void setRoles(Set<Role> roles) {
-        this.roles = roles;
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
     }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true;
+    }
+
 }
