@@ -52,6 +52,7 @@ public class SecurityConfig {
                 .and()
                 .authorizeRequests()
                 .requestMatchers("/api/auth/**").permitAll()
+                .requestMatchers("/signup").permitAll()
                 .requestMatchers("/dc/**").permitAll()
                 // .requestMatchers("/")
                 .anyRequest().authenticated()
