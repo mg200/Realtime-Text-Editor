@@ -24,8 +24,8 @@ import org.slf4j.LoggerFactory;
 @RestController
 @RequestMapping("/dc")
 @RequiredArgsConstructor
-public class DocumentHandler_temp {
-    private static final Logger logger = LoggerFactory.getLogger(DocumentHandler_temp.class);
+public class DocumentController_temp {
+    private static final Logger logger = LoggerFactory.getLogger(DocumentController_temp.class);
 
     @Autowired
     private DocumentService documentService;
