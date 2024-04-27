@@ -1,106 +1,124 @@
-// package com.envn8.app.controller;
+package com.envn8.app.controller;
 
-// import org.springframework.beans.factory.annotation.Autowired;
-// import org.springframework.http.HttpStatus;
-// import org.springframework.http.ResponseEntity;
-// import org.springframework.stereotype.Controller;
-// import org.springframework.web.bind.annotation.*;
-// import java.util.Optional;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.*;
+import java.util.Optional;
 
-// import com.envn8.app.models.Documents;
-// import com.envn8.app.models.User;
-// import com.envn8.app.service.DocumentService;
-// import com.envn8.app.service.userService;
-// import com.envn8.app.payload.request.DocumentRequest;
-// import com.envn8.app.security.config.JwtUtils;
+import com.envn8.app.models.Documents;
+import com.envn8.app.models.User;
+import com.envn8.app.service.DocumentService;
+import com.envn8.app.service.userService;
 
-// @Controller
-// // @RequestMapping("/dc")
-// public class DocumentHandler_temp {
+import lombok.RequiredArgsConstructor;
 
-//     @Autowired
-//     private DocumentService documentService;
-//     @Autowired
-//     private userService userService;
-//     @Autowired
-//     JwtUtils jwtUtils;
+import com.envn8.app.payload.request.DocumentRequest;
+import com.envn8.app.security.config.JwtService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-//     @PostMapping("/dc/create")
-//     public ResponseEntity<Documents> createDocument_temp(@RequestBody DocumentRequest documentRequest,
-//             @RequestHeader("Authorization") String token) {
-//         System.out.println(
-//                 "token recieved just after is: " + token);
-//         if (token == null || token.isEmpty()) {
-//             System.out.println("Token is null or empty");
-//             return null;
-//         }
-//         String actualToken = token.replace("Bearer ", "");
-//         String username_ = jwtUtils.getUserNameFromJwtToken(actualToken); // Replace with your method to get username
-//                                                                           // from token
-//         User user = userService.getUserByUsername(username_); // Get the user who is creating the document
-//         System.out.println("User info: " + user);
-//         Documents document = new Documents();
-//         document.setContent(documentRequest.getContent());
-//         document.setTitle(documentRequest.getTitle());
-//         document.setType(documentRequest.getType());
-//         document.setOwner(user);
-//         user.getDocuments().add(document);
-//         System.out.println("User documents: ******************");
-//         Documents savedDocument = documentService.createDocument(document);
-//         System.out.println("log at the end of createDocument_temp()");
-//         return new ResponseEntity<>(savedDocument, HttpStatus.CREATED);
-//     }
+@RestController
+@RequestMapping("/dc")
+@RequiredArgsConstructor
+public class DocumentHandler_temp {
+    private static final Logger logger = LoggerFactory.getLogger(DocumentHandler_temp.class);
 
-//     // Open a document
-//     @GetMapping("/dc/view/{id}")
-//     public ResponseEntity<Documents> viewDocument_temp(@PathVariable String id,
-//             @RequestHeader("Authorization") String token) {
-//         System.out.println("hello it's me " + token);
-//         String actualToken = token.replace("Bearer ", "");
-//         String username = jwtUtils.getUserNameFromJwtToken(actualToken);
-//         Optional<Documents> documentOptional = documentService.getDocumentById(id);
-//         if (documentOptional.isPresent()) {
-//             Documents document = documentOptional.get();
-//             if (document.getType().equals("public") || document.getOwner().getUsername().equals(username)
-//                     || document.getSharedWith().contains(userService.getUserByUsername(username))) {
-//                 System.out.println("***********Document info:************");
-//                 return new ResponseEntity<>(documentOptional.get(), HttpStatus.OK);
-//             } else {
-//                 System.out.println("Forbidden access to document!");
-//                 return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-//             }
-//         } else {
-//             System.out.println("Document not found!");
-//             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-//         }
-//     }
+    @Autowired
+    private DocumentService documentService;
+    @Autowired
+    private userService userService;
+    @Autowired
+    private JwtService jwtService;
 
-//     @GetMapping("/dc/viewAll")
-//     public ResponseEntity<Iterable<Documents>> viewAllDocuments(@RequestHeader("Authorization") String token) {
-//         System.out.println("at the start of viewAllDocuments()");
-//         String actualToken = token.replace("Bearer ", "");
-//         String username = jwtUtils.getUserNameFromJwtToken(actualToken);
-//         System.out.println("username: " + username + " token: " + actualToken);
-//         User user = userService.getUserByUsername(username); // Get
-//         Iterable<Documents> documents = user.getDocuments();
-//         // size of documents
-//         System.out.println("Size of documents: " + documents.spliterator().getExactSizeIfKnown());
-//         if (documents != null) {
-//             for (Documents doc : documents) {
-//                 System.out.println("Document title: " + doc.getTitle());
-//             }
-//             System.out.println("Documents is not null");
-//         } else {
-//             System.out.println("Documents is null");
-//         }
-//         System.out.println("log at the end of viewAllDocuments()");
+    @PostMapping("/create")
+    public ResponseEntity<?> createDocument_temp(@RequestBody DocumentRequest documentRequest,
+            @RequestHeader("Authorization") String token) {
+        if (token == null || token.isEmpty()) {
+            return new ResponseEntity<>("Token is null or empty", HttpStatus.UNAUTHORIZED);
+        }
+        String actualToken = token.replace("Bearer ", "");
+        String username = jwtService.extractUsername(actualToken);
 
-//         // return new ResponseEntity<>(documents, HttpStatus.OK);
-//         return new ResponseEntity<>(documents, HttpStatus.OK);
-//     }
+        // Load the user details
+        UserDetails userDetails = userService.getUserByUsername(username);
+        if (userDetails == null) {
+            return new ResponseEntity<>("User not found", HttpStatus.UNAUTHORIZED);
+        }
 
-//     @GetMapping("/sayHello")
-//     public void sayHello() {
-//         System.out.println("Hello from the server!");
-//     }
-// }
+        // Create the document
+        Documents document = new Documents();
+        document.setContent(documentRequest.getContent());
+        document.setTitle(documentRequest.getTitle());
+        document.setType(documentRequest.getType());
+
+        // Get the User object from the UserDetails
+        User user = (User) userDetails;
+        document.setOwner(user);
+
+        // Add the document to the user's documents
+        user.getDocuments().add(document);
+
+        // Save the document and the user
+        documentService.createDocument(document);
+        userService.saveUser(user);
+
+        return new ResponseEntity<>(document, HttpStatus.CREATED);
+    }
+
+    // Open a document
+    @GetMapping("/view/{id}")
+    public ResponseEntity<Documents> viewDocument_temp(@PathVariable String id,
+            @RequestHeader("Authorization") String token) {
+        System.out.println("hello it's me " + token);
+        String actualToken = token.replace("Bearer ", "");
+        String username = jwtService.extractUsername(actualToken);
+        Optional<Documents> documentOptional = documentService.getDocumentById(id);
+        if (documentOptional.isPresent()) {
+            Documents document = documentOptional.get();
+            if (document.getType().equals("public") || document.getOwner().getUsername().equals(username)
+                    || document.getSharedWith().contains(userService.getUserByUsername(username))) {
+                System.out.println("***********Document info:************");
+                return new ResponseEntity<>(documentOptional.get(), HttpStatus.OK);
+            } else {
+                System.out.println("Forbidden access to document!");
+                return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+            }
+        } else {
+            System.out.println("Document not found!");
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @GetMapping("/viewAll")
+    public ResponseEntity<Iterable<Documents>> viewAllDocuments(@RequestHeader("Authorization") String token) {
+        System.out.println("at the start of viewAllDocuments()");
+        String actualToken = token.replace("Bearer ", "");
+        String username = jwtService.extractUsername(actualToken);
+        System.out.println("username: " + username + " token: " + actualToken);
+        User user = userService.getUserByUsername(username); // Get
+        Iterable<Documents> documents = user.getDocuments();
+        // size of documents
+        int size = (int)documents.spliterator().getExactSizeIfKnown();
+        System.out.println("Size of documents: " +size );
+        if (size!=0){
+            System.out.println("Documents is not null");
+            for (Documents doc : documents) {
+                System.out.println("Document title: " + doc.getTitle());
+            }
+        } else {
+            logger.error("Documents is null");
+        }
+        System.out.println("log at the end of viewAllDocuments()");
+
+        return new ResponseEntity<>(documents, HttpStatus.OK);
+    }
+
+    @GetMapping("/sayHello")
+    public void sayHello() {
+        System.out.println("Hello from the server!");
+    }
+}

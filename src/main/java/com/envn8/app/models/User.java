@@ -1,5 +1,6 @@
 package com.envn8.app.models;
 
+import java.util.ArrayList;
 import java.util.Collection;
 // import java.util.HashSet;
 import java.util.List;
@@ -59,10 +60,10 @@ public class User implements UserDetails {
 
     @Enumerated(EnumType.STRING)
     private Role role;
-   
+   //note as of 27/4, I initialized these lists to avoid null pointer exceptions, might need to be removed
     @DBRef
-    private List<Documents> documents; // This represents the documents that the user owns
-    private List<Documents> sharedDocuments; // This represents the documents that are shared with the user
+    private List<Documents> documents=new ArrayList<>(); // This represents the documents that the user owns
+    private List<Documents> sharedDocuments=new ArrayList<>(); // This represents the documents that are shared with the user
 
     // public User() {
         // this.documents = new java.util.ArrayList<Documents>();
