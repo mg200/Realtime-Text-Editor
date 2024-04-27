@@ -14,20 +14,20 @@ import com.envn8.app.payload.response.AuthenticationResponse;
 import com.envn8.app.service.AuthenticationService;
 
 @RestController
-@RequestMapping("/api/v1/auth")
+@RequestMapping("/api/auth")
 @RequiredArgsConstructor
 public class AuthenticationController {
 
   private final AuthenticationService service;
 
-  @PostMapping("/register")
-  public ResponseEntity<AuthenticationResponse> register(
+  @PostMapping("/signup")
+  public ResponseEntity<AuthenticationResponse> signup(
       @RequestBody RegisterRequest request
   ) {
     return ResponseEntity.ok(service.register(request));
   }
-  @PostMapping("/authenticate")
-  public ResponseEntity<AuthenticationResponse> authenticate(
+  @PostMapping("/signin")
+  public ResponseEntity<AuthenticationResponse> signin(
       @RequestBody AuthenticationRequest request
   ) {
         System.out.println("inside authenticate"+request);
