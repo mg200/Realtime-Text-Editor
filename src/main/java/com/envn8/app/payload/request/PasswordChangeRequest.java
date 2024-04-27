@@ -21,9 +21,7 @@ public class PasswordChangeRequest {
     public String getUsername() {
       return username;
     }
-    // public void setPassword(String password) {
-        // this. = password;
-    //   }
+
     public String getOldpassword() {
       return Oldpassword;
     }

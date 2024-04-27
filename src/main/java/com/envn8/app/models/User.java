@@ -2,9 +2,7 @@ package com.envn8.app.models;
 
 import java.util.ArrayList;
 import java.util.Collection;
-// import java.util.HashSet;
 import java.util.List;
-// import java.util.Set;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -78,6 +76,11 @@ public class User implements UserDetails {
     //     this.sharedDocuments = new java.util.ArrayList<Documents>();
     // }
 
+    @Override
+    public String getUsername() {
+        return username;
+    }
+    
     public String getId() {
         return id;
     }
@@ -175,11 +178,6 @@ public class User implements UserDetails {
         return true;
     }
 
-    @Override
-    public String getUsername() {
-        // TODO Auto-generated method stub
-        return username;
-        // throw new UnsupportedOperationException("Unimplemented method 'getUsername'");
-    }
+    
 
 }
