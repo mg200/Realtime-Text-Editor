@@ -25,6 +25,11 @@ public class userService {
 
     public User getUserByUsername(String username) {
         return userRepository.findByUsername(username).orElseThrow(() -> new RuntimeException("User not found"));
+    }
+
+    public void saveUser(User user) {
+        userRepository.save(user);
+        
     }   
 
     // public User getUserByEmail(String email) {

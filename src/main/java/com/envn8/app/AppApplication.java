@@ -26,8 +26,8 @@ public class AppApplication implements CommandLineRunner {
 
 		if (userRepository.findAll().isEmpty()) {
 
-			userRepository.save(new User("ahmed", "waleed"));
-			userRepository.save(new User("omar", "waleed"));
+			// userRepository.save(new User("ahmed", "waleed"));
+			// userRepossitory.save(new User("omar", "waleed"));
 		}
 
 		for (User user : userRepository.findAll()) {

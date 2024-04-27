@@ -7,7 +7,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import com.envn8.app.models.Documents;
 import com.envn8.app.models.User;
-import com.envn8.app.security.jwt.JwtUtils;
+// import com.envn8.app.security.jwt.JwtUtils;
 import com.envn8.app.service.DocumentService;
 import com.envn8.app.service.userService;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
@@ -29,8 +29,8 @@ public class DocumentController {
     private userService userService;
     @Autowired
     private SimpMessagingTemplate messagingTemplate;
-    @Autowired
-    JwtUtils jwtUtils;
+    // @Autowired
+    // JwtUtils jwtUtils;
 
     @PostMapping("/documents")
     public ResponseEntity<Documents> createDocument(@RequestBody DocumentRequest documentRequest,
