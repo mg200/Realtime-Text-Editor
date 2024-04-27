@@ -25,11 +25,17 @@ public class AuthenticationService {
     public AuthenticationResponse register(RegisterRequest request) {
         //check if the username exists in the database, throw an exception if it does and print it to the console
         if (repository.existsByUsername(request.getUsername())) {
-            throw new RuntimeException("Username already exists");
+            // throw new RuntimeException("Username already exists");
+            return AuthenticationResponse.builder()
+                .token("Username already exists")
+                .build();
         }
         //check if the email exists in the
         if (repository.existsByEmail(request.getEmail())) {
-            throw new RuntimeException("Email already exists");
+            // throw new RuntimeException("Email already exists");
+            return AuthenticationResponse.builder()
+                .token("Email already exists")
+                .build();
         }
         var user = User.builder()
                 .firstName(request.getFirstname())
@@ -45,23 +51,6 @@ public class AuthenticationService {
                 .token(jwtToken)
                 .build();
     }
-
-    // public AuthenticationResponse authenticate(AuthenticationRequest request) {
-    //     System.out.println("inside authenticate email "+request);
-    //     authenticationManager.authenticate(
-    //             new UsernamePasswordAuthenticationToken(
-    //                     request.getEmail(),
-    //                     request.getPassword()));
-    //     var user = repository.findByEmail(request.getEmail())
-    //             .orElseThrow();
-    //     System.out.println("inside authenticate before var"+request.getEmail()+"\n");
-    //     var jwtToken = jwtService.generateToken(user);
-    //     System.out.println("JWT Token: " + jwtToken);
-    //     return AuthenticationResponse.builder()
-    //             .token(jwtToken)
-    //             .build();
-    // }
-
 
     public AuthenticationResponse authenticate(AuthenticationRequest request) {
         System.out.println("before authenticationManager in username"+request); 
@@ -79,4 +68,21 @@ public class AuthenticationService {
                 .token(jwtToken)
                 .build();
     }
+
+
+    // public AuthenticationResponse authenticate(AuthenticationRequest request) {
+    //     System.out.println("inside authenticate email "+request);
+    //     authenticationManager.authenticate(
+    //             new UsernamePasswordAuthenticationToken(
+    //                     request.getEmail(),
+    //                     request.getPassword()));
+    //     var user = repository.findByEmail(request.getEmail())
+    //             .orElseThrow();
+    //     System.out.println("inside authenticate before var"+request.getEmail()+"\n");
+    //     var jwtToken = jwtService.generateToken(user);
+    //     System.out.println("JWT Token: " + jwtToken);
+    //     return AuthenticationResponse.builder()
+    //             .token(jwtToken)
+    //             .build();
+    // }
 }

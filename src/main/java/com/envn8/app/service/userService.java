@@ -6,12 +6,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-public class userService {
+public class UserService {
 
     private final UserRepository userRepository;
 
     @Autowired
-    public userService(UserRepository userRepository) {
+    public UserService(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
 
@@ -32,9 +32,9 @@ public class userService {
         
     }   
 
-    // public User getUserByEmail(String email) {
-    //     return userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("User not found"));
-    // }
+    public User getUserByEmail(String email) {
+        return userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("User not found"));
+    }
 
     // public String forgetPassword(String username) {
     //     User user = userRepository.findByUsername(username).orElseThrow(() -> new RuntimeException("User not found"));
