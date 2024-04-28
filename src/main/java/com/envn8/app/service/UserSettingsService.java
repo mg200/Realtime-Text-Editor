@@ -3,6 +3,7 @@ package com.envn8.app.service;
 import org.springframework.http.ResponseEntity;
 // import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -21,9 +22,13 @@ public class UserSettingsService {
     private final UserService userservice;
     private final UserRepository userRepository;
     private final JwtService jwtService;
+    private final PasswordEncoder passwordEncoder;
 
     public Object changePassword(PasswordChangeRequest passwordChangeRequest,
             String token) {
+        System.out.println("at the start of changePassword()");
+        //log passwordChangeRequest
+        System.out.println("passwordChangeRequest: " + passwordChangeRequest);
         if (token == null || token.isEmpty()) {
             return ResponseEntity.badRequest().body("Token is null or empty");
         }
@@ -42,8 +47,10 @@ public class UserSettingsService {
             return ResponseEntity.badRequest().body("User not found");
         }
         User user = (User) userDetails;
-        if (user.getPassword().equals(passwordChangeRequest.getOldPassword())) {
-            user.setPassword(passwordChangeRequest.getNewPassword());
+        System.out.println("user: " + user.getPassword());
+        System.out.println("passwordEncoder.encode(passwordChangeRequest.getOldPassword()): " + passwordEncoder.encode(passwordChangeRequest.getOldPassword()));
+        if (passwordEncoder.matches(passwordChangeRequest.getOldPassword(), user.getPassword())) {
+            user.setPassword(passwordEncoder.encode(passwordChangeRequest.getNewPassword()));
             userRepository.save(user);
             return ResponseEntity.ok("Password changed successfully");
         } else {

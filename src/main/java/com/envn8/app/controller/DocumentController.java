@@ -176,33 +176,27 @@ public class DocumentController {
         }
     }
 
-
-    // //share a document
-    // @PostMapping("/share/{id}")
-    // public ResponseEntity<?> shareDocument(@PathVariable String id, @RequestBody
-    // String username,
-    // @RequestHeader("Authorization") String token) {
-    // String actualToken = token.replace("Bearer ", "");
-    // String ownerUsername = jwtService.extractUsername(actualToken);
-    // Optional<Documents> documentOptional = documentService.getDocumentById(id);
-    // if (documentOptional.isPresent()) {
-    // Documents document = documentOptional.get();
-    // if (document.getOwner().getUsername().equals(ownerUsername)) {
-    // User user = userService.getUserByUsername(username);
-    // if (user != null) {
-    // document.getSharedWith().add(user);
-    // documentService.createDocument(document);
-    // return new ResponseEntity<>("Document shared successfully", HttpStatus.OK);
-    // } else {
-    // return new ResponseEntity<>("User not found", HttpStatus.NOT_FOUND);
-    // }
-    // } else {
-    // return new ResponseEntity<>("You are not the owner of the document",
-    // HttpStatus.FORBIDDEN);
-    // }
-    // } else {
-    // return new ResponseEntity<>("Document not found", HttpStatus.NOT_FOUND);
-    // }
-    // }
+    // rename a document
+    //might want to make a separate request for this, instead of using the same DocumentRequest object
+    @PutMapping("/rename/{id}")
+    public ResponseEntity<?> renameDocument(@PathVariable String id,
+            @RequestBody DocumentRequest documentRequest,
+            @RequestHeader("Authorization") String token) {
+        String actualToken = token.replace("Bearer ", "");
+        String username = jwtService.extractUsername(actualToken);
+        Optional<Documents> documentOptional = documentService.getDocumentById(id);
+        if (documentOptional.isPresent()) {
+            Documents document = documentOptional.get();
+            if (document.getOwner().getUsername().equals(username)) {
+                document.setTitle(documentRequest.getTitle());
+                documentService.updateDocument(document);
+                return new ResponseEntity<>("Document renamed successfully", HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>("You are not the owner of the document", HttpStatus.FORBIDDEN);
+            }
+        } else {
+            return new ResponseEntity<>("Document not found", HttpStatus.NOT_FOUND);
+        }
+    }
 
 }
