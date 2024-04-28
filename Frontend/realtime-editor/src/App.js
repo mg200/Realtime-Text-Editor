@@ -10,14 +10,15 @@ function App() {
   const [option, setOption] = useState("");
   return (
     <Router>
-      <Navbar setOption={setOption} />
-      {option === "signup" ? <Signup /> : null}
-      {option === "login" ? <Login /> : null}
-      {option === "texteditor" ? <MainFeed /> : null}
+      <Navbar />
+
       <Routes>
         {/* <Route path="/" element={<Navigate to="/home" />} />
         <Route path="/home" element={option === "signup" ? <Signup /> : null} />
-        <Route path="/home" element={option === "login" ? <Login /> : null} /> */}
+// <Route path="/home" element={option === "login" ? <Login /> : null} /> */}
+        <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<Signup />} />
+        <Route path="/" element={<MainFeed />} />
         <Route path="/textEditor" element={<TextEditor />} />
       </Routes>
     </Router>

@@ -1,10 +1,12 @@
 import { Formik, Form, Field, ErrorMessage } from "formik";
+import { useContext } from "react";
 import * as Yup from "yup";
 import AlertBox from "./alretBox";
 import axios from "axios";
+import { AuthContext } from "./AuthProvider";
 const validationSchema = Yup.object().shape({
-  firstName: Yup.string().required("First Name is required"),
-  lastName: Yup.string().required("Last Name is required"),
+  firstname: Yup.string().required("First Name is required"),
+  lastname: Yup.string().required("Last Name is required"),
   email: Yup.string().email("Invalid email").required("Email is required"),
   username: Yup.string().required("username is required"),
   password: Yup.string()
@@ -13,13 +15,17 @@ const validationSchema = Yup.object().shape({
 });
 
 export default function Signup() {
+  const { isAuthenticated, logout } = useContext(AuthContext);
   async function handleSubmit(values, { setSubmitting }) {
-    console.log(values);
     try {
-      const res = await axios.post("http://localhost:8000/api/auth/signup", values);
+      const res = await axios.post(
+        "http://localhost:8000/api/auth/signup",
+        values
+      );
       const { token } = res.data;
       localStorage.setItem("token", token);
       console.log("Token saved in localStorage:", token);
+      window.location.href = "/";
     } catch (error) {
       console.error("Error:", error);
     }
@@ -41,8 +47,8 @@ export default function Signup() {
               <div className="card-body py-5 px-md-5">
                 <Formik
                   initialValues={{
-                    firstName: "",
-                    lastName: "",
+                    firstname: "",
+                    lastname: "",
                     email: "",
                     username: "",
                     password: "",
@@ -53,30 +59,30 @@ export default function Signup() {
                   {({ isSubmitting }) => (
                     <Form>
                       <div className="form-outline mb-4">
-                        <label htmlFor="firstName" className="form-label">
+                        <label htmlFor="firstname" className="form-label">
                           First Name
                         </label>
                         <Field
                           type="text"
-                          name="firstName"
+                          name="firstname"
                           className="form-control"
                         />
-                        <ErrorMessage name="firstName" component={AlertBox} />
+                        <ErrorMessage name="firstname" component={AlertBox} />
                       </div>
 
                       <div className="form-outline mb-4">
-                        <label htmlFor="lastName" className="form-label">
+                        <label htmlFor="lastname" className="form-label">
                           Last Name
                         </label>
                         <Field
                           type="text"
-                          name="lastName"
+                          name="lastname"
                           className="form-control"
                         />
-                        <ErrorMessage name="lastName" component={AlertBox} />
+                        <ErrorMessage name="lastname" component={AlertBox} />
                       </div>
                       <div className="form-outline mb-4">
-                        <label htmlFor="firstName" className="form-label">
+                        <label htmlFor="firstname" className="form-label">
                           username
                         </label>
                         <Field

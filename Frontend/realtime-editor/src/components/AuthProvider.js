@@ -12,11 +12,6 @@ const AuthProvider = ({ children }) => {
     }
   }, []);
 
-  //   const login = () => {
-  //     localStorage.setItem("token", "your_token_here");
-  //     setIsAuthenticated(true);
-  //   };
-
   const logout = () => {
     localStorage.removeItem("token");
     setIsAuthenticated(false);
