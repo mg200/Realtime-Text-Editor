@@ -5,8 +5,66 @@ import { Button } from "react-bootstrap";
 import TextEditor from "./textEditor";
 import { AuthContext } from "./AuthProvider";
 import Login from "./login";
+import { useEffect } from "react";
+import axios from "axios";
 
 function App() {
+  useEffect(() => {
+    // Fetch owned documents when component mounts
+    fetchOwnedDocuments();
+    fetchSharedDocuments();
+  }, []);
+  async function fetchSharedDocuments() {
+    const token = localStorage.getItem("token");
+    try {
+      const res = await axios.get(
+        `http://localhost:8000/dc/viewShared`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+      );
+      console.log("Fetched shared documents:", res.data);
+      // Update your state with the fetched documents here
+      setSharedDocuments(res.data.map(doc => ({
+        id: doc.id,
+        title: doc.title,
+        content: doc.content
+      })));
+    } catch (error) {
+ 
+        console.error("Error fetching shared documents:", error);
+      }
+    }
+  async function fetchOwnedDocuments() {
+    const token = localStorage.getItem("token");
+    try {
+      const res = await axios.get(
+        `http://localhost:8000/dc/viewAll`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+      );
+      console.log("Fetched owned documents:", res.data);
+      // Update your state with the fetched documents here
+      setOwnedDocuments(res.data.map(doc => ({
+        id: doc.id,
+        title: doc.title,
+        content: doc.content
+      })));
+    } catch (error) {
+      if (error.response.status === 403) {
+        alert("Your Session expired. Logging out...");
+        // console.error("Token expired. Logging out...");
+        logout();
+      } else {
+        console.error("Error fetching owned documents:", error);
+      }
+    }
+  }
   const [ownedDocuments, setOwnedDocuments] = useState([]);
   const [sharedDocuments, setSharedDocuments] = useState([]);
   const { isAuthenticated, logout } = useContext(AuthContext);
@@ -15,33 +73,96 @@ function App() {
   const handleOpenModal = () => setModalShow(true);
   const handleCloseModal = () => setModalShow(false);
 
-  const handleCreate = (documentName) => {
-    const newDocument = { id: Date.now(), name: documentName };
+  const handleCreate = (documentTitle) => {
+    const newDocument = { id: Date.now(), title: documentTitle };
     setOwnedDocuments([...ownedDocuments, newDocument]);
+    fetchOwnedDocuments();
   };
+  async function handleDelete(documentId) {
+    const token = localStorage.getItem("token");
+  
+    try {
+      const res = await axios.delete(
+        `http://localhost:8000/dc/delete/${documentId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+      );
+  
+      console.log("Document deleted:", res.data);
+      // Update your state with the deleted document here
+      setOwnedDocuments(ownedDocuments.filter((doc) => doc.id !== documentId));
+    } catch (error) {
+      console.error("Error deleting document:", error);
+    }
+  }
 
-  const handleDelete = (documentId) => {
-    setOwnedDocuments(ownedDocuments.filter((doc) => doc.id !== documentId));
-  };
-
-  const handleRename = (documentId, newName) => {
-    if (newName) {
+  async function handleRename(documentId, newName) {
+    const token = localStorage.getItem("token");
+  
+    try {
+      const res = await axios.put(
+        `http://localhost:8000/dc/rename/${documentId}`,
+        { title: newName },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+      );
+  
+      console.log("Document renamed:", res.data);
+      // Update your state with the renamed document here
       setOwnedDocuments((docs) =>
         docs.map((doc) =>
-          doc.id === documentId ? { ...doc, name: newName } : doc
+          doc.id === documentId ? { ...doc, title: newName } : doc
         )
       );
+    } catch (error) {
+      console.error("Error renaming document:", error);
     }
-  };
+  }
 
-  const handleShare = (documentId) => {
-    // Handle sharing logic here
-    alert(`Document with ID ${documentId} shared!`);
-  };
+  async function handleShare(documentId, username, permission) {
+    const token = localStorage.getItem("token");
+  
+    try {
+      const res = await axios.post(
+        `http://localhost:8000/dc/share/${documentId}`,
+        { username: username, permission: permission },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        } 
+      );
+  
+      console.log("Document shared:", res.data);
+      // Update your state with the shared document here
+      // setSharedDocuments([...sharedDocuments, res.data]);
+    } catch (error) {
+      console.error("Error sharing document:", error);
+    }
+  }
 
-  const handleOpen = (documentId) => {
-    // Handle document opening logic here
-    alert(`Opening document with ID ${documentId}`);
+  const handleOpen = async (documentId) => {
+    const token = localStorage.getItem("token");
+  
+    try {
+      const res = await axios.get(
+        `http://localhost:8000/dc/view/${documentId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+      );
+      console.log("Opened document:", res.data);
+    } catch (error) {
+      console.error("Error opening document:", error);
+    }
   };
 
   return (
@@ -72,7 +193,7 @@ function App() {
             onOpen={handleOpen}
           />
 
-          <h2>Shared Documents</h2>
+          <h2>Shared With You</h2>
           <DocumentList
             documents={sharedDocuments}
             onDelete={handleDelete}

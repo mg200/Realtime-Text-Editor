@@ -82,7 +82,7 @@ public class DocumentController {
             if (document.getType().equals("public") || document.getOwner().getUsername().equals(username)
                     || document.getSharedWith().contains(userService.getUserByUsername(username))) {
                 System.out.println("***********Document info:************");
-                return new ResponseEntity<>(documentOptional.get(), HttpStatus.OK);
+                return new ResponseEntity<>(document, HttpStatus.OK);
             } else {
                 System.out.println("Forbidden access to document!");
                 return new ResponseEntity<>(HttpStatus.FORBIDDEN);
@@ -152,6 +152,7 @@ public class DocumentController {
                     document.getSharedWith().add(user);
                     document.getPermissions().put(user.getId(), shareRequest.getPermission());
                     documentService.createDocument(document);
+                    user.getSharedDocuments().add(document);
                     return new ResponseEntity<>("Document shared successfully", HttpStatus.OK);
                 } else {
                     return new ResponseEntity<>("User not found", HttpStatus.NOT_FOUND);
@@ -161,6 +162,19 @@ public class DocumentController {
             }
         } else {
             return new ResponseEntity<>("Document not found", HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @GetMapping("/viewShared")
+    public ResponseEntity<Iterable<Documents>> viewSharedDocuments(@RequestHeader("Authorization") String token) {
+        String actualToken = token.replace("Bearer ", "");
+        String username = jwtService.extractUsername(actualToken);
+        User user = userService.getUserByUsername(username); // Get the current user
+        if (user != null) {
+            Iterable<Documents> sharedDocuments = user.getSharedDocuments();
+            return new ResponseEntity<>(sharedDocuments, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
     }
 
@@ -177,7 +191,8 @@ public class DocumentController {
     }
 
     // rename a document
-    //might want to make a separate request for this, instead of using the same DocumentRequest object
+    // might want to make a separate request for this, instead of using the same
+    // DocumentRequest object
     @PutMapping("/rename/{id}")
     public ResponseEntity<?> renameDocument(@PathVariable String id,
             @RequestBody DocumentRequest documentRequest,

@@ -5,11 +5,20 @@ import { MdDelete } from "react-icons/md";
 import { FaRegShareSquare } from "react-icons/fa";
 import { FaRegFolderOpen } from "react-icons/fa";
 import Rename from "./Rename";
+import Share from "./share";
 
 function DocumentList({ documents, onDelete, onRename, onShare, onOpen }) {
   const [isRenameVisible, setRenameVisible] = useState(false);
+  const [isShareVisible, setShareVisible] = useState(false);
   const [selectedDocId, setSelectedDocId] = useState(null);
-
+  // Function to handle sharing
+  const handleShare = (username, permission) => {
+    if (selectedDocId) {
+      console.log(selectedDocId, username, permission);
+      onShare(selectedDocId, username, permission);
+      setShareVisible(false); 
+    }
+  };
   // Function to handle renaming
   const handleRename = (newName) => {
     if (selectedDocId) {
@@ -18,6 +27,10 @@ function DocumentList({ documents, onDelete, onRename, onShare, onOpen }) {
       setRenameVisible(false); // Close the modal after renaming
     }
   };
+  const handleOpen = (docId) => {
+    if(selectedDocId)
+    onOpen(docId);
+  }
   return (
     <Row>
       {documents.map((doc) => (
@@ -59,16 +72,28 @@ function DocumentList({ documents, onDelete, onRename, onShare, onOpen }) {
                   variant="info"
                   size="sm"
                   className="mx-1 rounded-5 p-2 m-1"
-                  onClick={() => onShare(doc.id)}
+                  onClick={() => {
+                    setSelectedDocId(doc.id);
+                    setShareVisible(true);
+                  }}
                 >
                   <FaRegShareSquare />
                   Share
                 </Button>
+                <Share 
+                  show={isShareVisible}
+                  handleClose={() => setShareVisible(false)}
+                  HandleSubmit={handleShare}
+                />
                 <Button
                   variant="primary"
                   size="sm"
                   className="mx-1 rounded-5 p-2 m-1"
-                  onClick={() => onOpen(doc.id)}
+                  onClick={() => {
+                    setSelectedDocId(doc.id);
+                    onOpen(doc.id);
+                  }
+                  }
                 >
                   <FaRegFolderOpen /> Open
                 </Button>
