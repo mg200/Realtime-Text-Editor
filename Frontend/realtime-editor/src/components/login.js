@@ -1,17 +1,18 @@
 import React from "react";
 import axios from "axios";
+import { useContext } from "react";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import AlertBox from "./alretBox";
-
+import { AuthContext } from "./AuthProvider";
 export default function Login() {
   const validationSchema = Yup.object().shape({
-    username: Yup.string().required("username is required"),
+    username: Yup.string().required("Username is required"),
     password: Yup.string()
       .min(6, "Password must be at least 6 characters")
       .required("Password is required"),
   });
-
+  const { isAuthenticated, logout } = useContext(AuthContext); // was missing
   async function handleSubmit(values, { setSubmitting }) {
     console.log(values);
     try {
