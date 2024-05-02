@@ -5,9 +5,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
+// import org.springframework.web.bind.annotation.PostMapping;
+// import org.springframework.web.bind.annotation.RequestBody;
+// import org.springframework.web.bind.annotation.RequestHeader;
 
 import com.envn8.app.models.User;
 import com.envn8.app.payload.request.PasswordChangeRequest;
@@ -27,7 +27,6 @@ public class UserSettingsService {
     public Object changePassword(PasswordChangeRequest passwordChangeRequest,
             String token) {
         System.out.println("at the start of changePassword()");
-        //log passwordChangeRequest
         System.out.println("passwordChangeRequest: " + passwordChangeRequest);
         if (token == null || token.isEmpty()) {
             return ResponseEntity.badRequest().body("Token is null or empty");
@@ -59,9 +58,5 @@ public class UserSettingsService {
 
     }
 
-    // public Object changePassword(PasswordChangeRequest passwordChangeRequest) {
-    // // TODO Auto-generated method stub
-    // throw new UnsupportedOperationException("Unimplemented method
-    // 'changePassword'");
-    // }
+
 }
