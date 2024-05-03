@@ -4,6 +4,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.handler.annotation.DestinationVariable;
+import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import java.util.Optional;
@@ -19,6 +22,7 @@ import com.envn8.app.payload.request.DocumentRequest;
 import com.envn8.app.payload.request.ShareDocumentRequest;
 import com.envn8.app.security.config.JwtService;
 import org.slf4j.Logger;
+
 
 @RestController
 @RequestMapping("/dc")
@@ -212,6 +216,25 @@ public class DocumentController {
         } else {
             return new ResponseEntity<>("Document not found", HttpStatus.NOT_FOUND);
         }
+    }
+    @GetMapping("/dc/view/{id}")
+    public ResponseEntity<?> getDocumentContent(@PathVariable String id) {
+        Optional<Documents> documentOptional = documentService.getDocumentById(id);
+        if (documentOptional.isPresent()) {
+             Documents document = documentOptional.get();
+             String content = document.getContent(); // Assuming content is a property of Documents entity
+            return new ResponseEntity<>("aloooo ya habeby", HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>("Document not found", HttpStatus.NOT_FOUND);
+        }
+    }
+    
+
+    @MessageMapping("/document/{documentId}/edit")
+    @SendTo("/topic/document/{documentId}/content")
+    public String editDocument(@DestinationVariable String documentId, String content) {
+       
+        return content;
     }
 
 }

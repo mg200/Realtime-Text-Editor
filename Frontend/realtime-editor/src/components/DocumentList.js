@@ -16,7 +16,7 @@ function DocumentList({ documents, onDelete, onRename, onShare, onOpen }) {
     if (selectedDocId) {
       console.log(selectedDocId, username, permission);
       onShare(selectedDocId, username, permission);
-      setShareVisible(false); 
+      setShareVisible(false);
     }
   };
   // Function to handle renaming
@@ -28,15 +28,14 @@ function DocumentList({ documents, onDelete, onRename, onShare, onOpen }) {
     }
   };
   const handleOpen = (docId) => {
-    if(selectedDocId)
-    onOpen(docId);
-  }
+    if (selectedDocId) onOpen(docId);
+  };
   return (
     <Row>
       {documents.map((doc) => (
         <Col key={doc.id} sm={12} md={6} lg={3} className="mb-3">
           <Card>
-            <Card.Title className="m-4">{doc.name}</Card.Title>
+            <Card.Title className="m-4">{doc.title}</Card.Title>
             <Card.Body
               className="d-flex flex-column justify-content-between h-100 mt-4"
               style={{ backgroundColor: "#DCDCDC" }}
@@ -80,7 +79,7 @@ function DocumentList({ documents, onDelete, onRename, onShare, onOpen }) {
                   <FaRegShareSquare />
                   Share
                 </Button>
-                <Share 
+                <Share
                   show={isShareVisible}
                   handleClose={() => setShareVisible(false)}
                   HandleSubmit={handleShare}
@@ -92,8 +91,7 @@ function DocumentList({ documents, onDelete, onRename, onShare, onOpen }) {
                   onClick={() => {
                     setSelectedDocId(doc.id);
                     onOpen(doc.id);
-                  }
-                  }
+                  }}
                 >
                   <FaRegFolderOpen /> Open
                 </Button>

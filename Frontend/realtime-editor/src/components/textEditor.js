@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useEditor, EditorContent, EditorProvider } from "@tiptap/react";
 import { Button } from "react-bootstrap";
 import { BiHeading, BiBold, BiItalic, BiStrikethrough } from "react-icons/bi";
@@ -16,10 +16,10 @@ import OrderedList from "@tiptap/extension-ordered-list";
 import ListItem from "@tiptap/extension-list-item";
 import TextAlign from "@tiptap/extension-text-align";
 
-const content = `
-
-`;
-
+import Stomp from "stompjs";
+import { useQuery } from "react-query";
+import { useParams } from "react-router-dom";
+import axios from "axios";
 const extensions = [
   StarterKit,
   Heading,
@@ -38,23 +38,49 @@ const extensions = [
   TextAlign,
 ];
 
+const fetchContent = async (documentId) => {
+  console.log("ssssssssssss", documentId);
+  const token = localStorage.getItem("token");
+  const res = await axios.get(`http://localhost:8000/dc/view/${documentId}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  return res.data;
+};
+
 const TextEditor = () => {
+  const { documentId } = useParams();
+  const [content, setContent] = useState("");
+  const {
+    data: Document,
+    isLoading,
+    isError,
+  } = useQuery([documentId], () => fetchContent(documentId));
+
+  useEffect(() => {
+    if (Document) {
+      setContent(Document.title);
+      editor;
+    }
+  }, [Document]);
+
   const editor = useEditor({
     extensions: extensions,
     content: content,
     onUpdate: ({ editor }) => {
-      content = editor.getJSON();
-      console.log(content);
-      sendContentToServer(content);
+      setContent(editor.getHTML());
     },
   });
-  useEffect(() => {
-    const unsubscribe = RecieveFromServer((content) => {
-      editor.commands.setContent(content);
-    });
-    // Clean up the listener when the component is unmounted/deleted
-    return unsubscribe;
-  }, [editor]);
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+
+  if (isError) {
+    return <div>Error fetching content</div>;
+  }
+
   return (
     <div className="container border mt-4 vh-100 w-50">
       <MenuBar editor={editor} />
@@ -62,31 +88,7 @@ const TextEditor = () => {
     </div>
   );
 };
-let ws = new WebSocket('ws://localhost:8000/ws'); 
-function sendContentToServer(content) {
-  const message = {
-    type: 'edit',
-    content: content,
-    // userId: userId, //// TODO: Add the userId here
-  };
-  ws.send(JSON.stringify(message));
-}
 
-function RecieveFromServer(callback) {
-  // Set up a listener for updates from the server
-  ws.onopen = () => {
-  ws.onmessage = (event) => {
-    const message = JSON.parse(event.data);
-    if (message.type === 'edit') {
-      callback(message.content);
-    }
-  };
-  };
-  // Return a function that removes the listener
-  return () => {
-    ws.onmessage = null;
-  };
-}
 export default TextEditor;
 
 const MenuBar = ({ editor }) => {
@@ -137,7 +139,6 @@ const MenuBar = ({ editor }) => {
       >
         <AiOutlineOrderedList size={20} />
       </Button>
-      {/* Add more buttons for other functionality as needed */}
     </div>
   );
 };
