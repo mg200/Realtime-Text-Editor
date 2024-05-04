@@ -8,6 +8,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.OneToMany;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -63,6 +64,8 @@ public class User implements UserDetails {
     private List<Documents> documents=new ArrayList<>(); // This represents the documents that the user owns
     private List<Documents> sharedDocuments=new ArrayList<>(); // This represents the documents that are shared with the user
 
+    @DBRef
+    private List<Token>tokens;
     // public User() {
         // this.documents = new java.util.ArrayList<Documents>();
         // this.sharedDocuments = new java.util.ArrayList<Documents>();

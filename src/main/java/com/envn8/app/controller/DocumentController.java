@@ -34,7 +34,7 @@ public class DocumentController {
     private JwtService jwtService;
 
     @PostMapping("/create")
-    public ResponseEntity<?> createDocument_temp(@RequestBody DocumentRequest documentRequest,
+    public ResponseEntity<?> createDocument(@RequestBody DocumentRequest documentRequest,
             @RequestHeader("Authorization") String token) {
         System.out.println("at the start of createDocument_temp()");
         if (token == null || token.isEmpty()) {
@@ -71,7 +71,7 @@ public class DocumentController {
 
     // Open a document
     @GetMapping("/view/{id}")
-    public ResponseEntity<Documents> viewDocument_temp(@PathVariable String id,
+    public ResponseEntity<Documents> viewDocument(@PathVariable String id,
             @RequestHeader("Authorization") String token) {
         // System.out.println("hello it's me " + token);
         String actualToken = token.replace("Bearer ", "");
@@ -81,7 +81,6 @@ public class DocumentController {
             Documents document = documentOptional.get();
             if (document.getType().equals("public") || document.getOwner().getUsername().equals(username)
                     || document.getSharedWith().contains(userService.getUserByUsername(username))) {
-                System.out.println("***********Document info:************");
                 return new ResponseEntity<>(document, HttpStatus.OK);
             } else {
                 System.out.println("Forbidden access to document!");
@@ -95,7 +94,6 @@ public class DocumentController {
 
     @GetMapping("/viewAll")
     public ResponseEntity<Iterable<Documents>> viewAllDocuments(@RequestHeader("Authorization") String token) {
-        System.out.println("at the start of viewAllDocuments()");
         String actualToken = token.replace("Bearer ", "");
         String username = jwtService.extractUsername(actualToken);
         System.out.println("username: " + username + " token: " + actualToken);
@@ -103,7 +101,7 @@ public class DocumentController {
         Iterable<Documents> documents = user.getDocuments();
         // size of documents
         int size = (int) documents.spliterator().getExactSizeIfKnown();
-        System.out.println("Size of documents: " + size);
+        // System.out.println("Size of documents: " + size);
         if (size != 0) {
             System.out.println("Documents is not null");
             for (Documents doc : documents) {
@@ -112,7 +110,7 @@ public class DocumentController {
         } else {
             logger.error("Documents is null");
         }
-        System.out.println("log at the end of viewAllDocuments()");
+        // System.out.println("log at the end of viewAllDocuments()");
 
         return new ResponseEntity<>(documents, HttpStatus.OK);
     }

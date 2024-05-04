@@ -1,13 +1,9 @@
 package com.envn8.app.service;
 
 import org.springframework.http.ResponseEntity;
-// import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-// import org.springframework.web.bind.annotation.PostMapping;
-// import org.springframework.web.bind.annotation.RequestBody;
-// import org.springframework.web.bind.annotation.RequestHeader;
 
 import com.envn8.app.models.User;
 import com.envn8.app.payload.request.PasswordChangeRequest;

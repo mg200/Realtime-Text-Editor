@@ -1,15 +1,13 @@
 package com.envn8.app.models;
 
-import com.envn8.app.models.User;
+import org.bson.types.ObjectId;
+import org.springframework.data.mongodb.core.mapping.DBRef;
+import org.springframework.data.mongodb.core.mapping.Document;
+
 import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -19,12 +17,11 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity
+@Document(collection = "tokens")
 public class Token {
 
   @Id
-  @GeneratedValue
-  public Integer id;
+  public ObjectId id;//objectID to ensure uniqueness of the ID from the User ID
 
   @Column(unique = true)
   public String token;
@@ -36,7 +33,6 @@ public class Token {
 
   public boolean expired;
 
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "user_id")
+  @DBRef(lazy = true)
   public User user;
 }

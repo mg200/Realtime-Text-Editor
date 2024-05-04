@@ -1,27 +1,16 @@
-// package com.envn8.app.repository;
-// import java.util.Optional;
-// import java.util.List;
-// import org.springframework.data.mongodb.repository.MongoRepository;
-// import org.springframework.data.mongodb.repository.Query;
+package com.envn8.app.repository;
+import java.util.List;
+import java.util.Optional;
 
-// import com.envn8.app.models.Token;
-// public interface TokenRepository extends MongoRepository<Token, String> {
+import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.data.mongodb.repository.Query;
 
-//   @Query("{ 'user.id': ?0, '$or': [ { 'expired': false }, { 'revoked': false } ] }")
-//   List<Token> findAllValidTokenByUser(String id);
+import com.envn8.app.models.Token;
 
-//   Token findByToken(String token);
-// }// package com.envn8.app.repository;
-// // import java.util.Optional;
-// // import java.util.List;
-// // import org.springframework.data.mongodb.repository.MongoRepository;
-// // import org.springframework.data.mongodb.repository.Query;
+public interface TokenRepository extends MongoRepository<Token, String> {
 
-// // import com.envn8.app.models.Token;
-// // public interface TokenRepository extends MongoRepository<Token, String> {
+  @Query("{ 'user.id': ?0, '$or': [ { 'expired': false }, { 'revoked': false } ] }")
+  List<Token> findAllValidTokenByUser(String id);
 
-// //   @Query("{ 'user.id': ?0, '$or': [ { 'expired': false }, { 'revoked': false } ] }")
-// //   List<Token> findAllValidTokenByUser(String id);
-
-// //   Token findByToken(String token);
-// // }
+  Optional<Token> findByToken(String token);
+}
