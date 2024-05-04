@@ -29,8 +29,13 @@ public class SecurityConfiguration {
         .csrf()
         .disable()
         .authorizeHttpRequests()
+<<<<<<< Updated upstream
         .requestMatchers("/api/auth/**", "/api/v1/auth/**"
         )
+=======
+        .requestMatchers("/api/auth/**",
+        "dc/**","*")
+>>>>>>> Stashed changes
         .permitAll()
         .anyRequest()
         .authenticated()

@@ -39,28 +39,30 @@ function App() {
   }
   async function fetchOwnedDocuments() {
     const token = localStorage.getItem("token");
-    try {
-      const res = await axios.get(`http://localhost:8000/dc/viewAll`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      console.log("Fetched owned documents:", res.data);
-      // Update your state with the fetched documents here
-      setOwnedDocuments(
-        res.data.map((doc) => ({
-          id: doc.id,
-          title: doc.title,
-          content: doc.content,
-        }))
-      );
-    } catch (error) {
-      if (error.response.status === 403) {
-        alert("Your Session expired. Logging out...");
-        // console.error("Token expired. Logging out...");
-        logout();
-      } else {
-        console.error("Error fetching owned documents:", error);
+    if (token) {
+      try {
+        const res = await axios.get(`http://localhost:8000/dc/viewAll`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        console.log("Fetched owned documents:", res.data);
+        // Update your state with the fetched documents here
+        setOwnedDocuments(
+          res.data.map((doc) => ({
+            id: doc.id,
+            title: doc.title,
+            content: doc.content,
+          }))
+        );
+      } catch (error) {
+        if (error.response.status === 403) {
+          alert("Your Session expired. Logging out...");
+          // console.error("Token expired. Logging out...");
+          logout();
+        } else {
+          console.error("Error fetching owned documents:", error);
+        }
       }
     }
   }

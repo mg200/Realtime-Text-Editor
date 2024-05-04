@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import java.util.Optional;
@@ -226,11 +227,17 @@ public class DocumentController {
             return new ResponseEntity<>("Document not found", HttpStatus.NOT_FOUND);
         }
     }
-    
+    // @Autowired
+    // private SimpMessagingTemplate messagingTemplate;
 
-    @MessageMapping("/document/{documentId}/edit")
+    // public void broadcastDocumentUpdate(String documentId, String updateMessage) {
+    //     messagingTemplate.convertAndSend("/topic/document/" + documentId, updateMessage);
+    // }
+
+    @MessageMapping("/document/{documentId}")
     @SendTo("/topic/document/{documentId}/content")
     public String editDocument(@DestinationVariable String documentId, String content) {
+        System.out.println("aywaa ya sahbyyy");
        
         return content;
     }

@@ -30,6 +30,10 @@
     "react-query": "^3.39.3",
     "react-router-dom": "^6.23.0",
     "react-scripts": "5.0.1",
+    "react-stomp": "^5.1.0",
+    "socket.io-client": "^4.7.5",
+    "sockjs": "^0.3.24",
+    "sockjs-client": "^1.6.1",
     "stompjs": "^2.3.3",
     "web-vitals": "^2.1.4",
     "yup": "^1.4.0"

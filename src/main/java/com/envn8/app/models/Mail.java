@@ -3,17 +3,17 @@ package com.envn8.app.models;
 import java.util.Date;
 import java.util.List;
 
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
+// import jakarta.validation.constraints.Email;
+// import jakarta.validation.constraints.NotBlank;
 
 public class Mail {
-    @NotBlank
-    @Email
+    // @NotBlank
+    // @Email
     private String from;
-    @NotBlank
-    @Email
+    // @NotBlank
+    // @Email
     private String to;
-    @NotBlank
+    // @NotBlank
     private String subject;
     private String cc;
     private String body;

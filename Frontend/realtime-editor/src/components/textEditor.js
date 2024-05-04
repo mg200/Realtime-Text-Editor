@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { useEditor, EditorContent, EditorProvider } from "@tiptap/react";
+import React, { useEffect, useState, useRef } from "react";
+import { useEditor, EditorContent } from "@tiptap/react";
 import { Button } from "react-bootstrap";
 import { BiHeading, BiBold, BiItalic, BiStrikethrough } from "react-icons/bi";
 import { AiOutlineOrderedList } from "react-icons/ai";
@@ -13,13 +13,12 @@ import Code from "@tiptap/extension-code";
 import CodeBlock from "@tiptap/extension-code-block";
 import BulletList from "@tiptap/extension-bullet-list";
 import OrderedList from "@tiptap/extension-ordered-list";
-import ListItem from "@tiptap/extension-list-item";
 import TextAlign from "@tiptap/extension-text-align";
 
-import Stomp from "stompjs";
 import { useQuery } from "react-query";
 import { useParams } from "react-router-dom";
 import axios from "axios";
+
 const extensions = [
   StarterKit,
   Heading,
@@ -34,12 +33,10 @@ const extensions = [
   }),
   BulletList,
   OrderedList,
-  ListItem,
   TextAlign,
 ];
 
 const fetchContent = async (documentId) => {
-  console.log("ssssssssssss", documentId);
   const token = localStorage.getItem("token");
   const res = await axios.get(`http://localhost:8000/dc/view/${documentId}`, {
     headers: {
@@ -57,21 +54,65 @@ const TextEditor = () => {
     isLoading,
     isError,
   } = useQuery([documentId], () => fetchContent(documentId));
+  const [socket, setSocket] = useState(null);
+  const [messages, setMessages] = useState("");
 
   useEffect(() => {
     if (Document) {
       setContent(Document.title);
-      editor;
     }
   }, [Document]);
+
+  useEffect(() => {
+    const socket = new WebSocket(`ws://localhost:8000/topic/${documentId}`);
+    socket.onopen = () => {
+      console.log("WebSocket connected");
+    };
+    socket.onmessage = (event) => {
+      // const receivedMessage = JSON.parse(event.data);
+      console.log("aywaaa ya habeeb akhook", event.data);
+      setContent(event.data.content);
+      // setMessages((prev) => [...prev, receivedMessage]);
+    };
+    socket.onerror = (error) => {
+      console.error("WebSocket error:", error);
+    };
+
+    setSocket(socket);
+
+    return () => {
+      socket.close();
+    };
+  }, [documentId]);
+
+  const sendContentToServer = (content) => {
+    if (socket) {
+      const data = {
+        documentId: documentId,
+        content: content,
+      };
+      socket.send(JSON.stringify(data));
+    }
+  };
 
   const editor = useEditor({
     extensions: extensions,
     content: content,
     onUpdate: ({ editor }) => {
-      setContent(editor.getHTML());
+      const content = editor.getHTML();
+      // Send the edited content to the server
+      sendContentToServer(content);
     },
   });
+  useEffect(() => {
+    // Update the editor's content when setContent is updated
+    if (editor) {
+      editor.commands.setContent(content);
+    }
+  }, [content, editor]);
+  // useEffect(() => {
+  //   editor.commands.setContent(content);
+  // }, [content, editor]);
 
   if (isLoading) {
     return <div>Loading...</div>;
