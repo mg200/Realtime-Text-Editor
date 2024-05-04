@@ -5,23 +5,27 @@ import Login from "./components/login";
 import MainFeed from "./components/mainfeed";
 import TextEditor from "./components/textEditor";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { QueryClient, QueryClientProvider } from "react-query";
 
+const queryClient = new QueryClient();
 function App() {
   const [option, setOption] = useState("");
   return (
-    <Router>
-      <Navbar />
+    <QueryClientProvider client={queryClient}>
+      <Router>
+        <Navbar />
 
-      <Routes>
-        {/* <Route path="/" element={<Navigate to="/home" />} />
+        <Routes>
+          {/* <Route path="/" element={<Navigate to="/home" />} />
         <Route path="/home" element={option === "signup" ? <Signup /> : null} />
 // <Route path="/home" element={option === "login" ? <Login /> : null} /> */}
-        <Route path="/login" element={<Login />} />
-        <Route path="/signup" element={<Signup />} />
-        <Route path="/" element={<MainFeed />} />
-        <Route path="/textEditor" element={<TextEditor />} />
-      </Routes>
-    </Router>
+          <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
+          <Route path="/" element={<MainFeed />} />
+          <Route path="dc/view/:documentId" element={<TextEditor />} />
+        </Routes>
+      </Router>
+    </QueryClientProvider>
   );
 }
 

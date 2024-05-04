@@ -7,8 +7,10 @@ import { AuthContext } from "./AuthProvider";
 import Login from "./login";
 import { useEffect } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 function App() {
+  const navigate = useNavigate();
   useEffect(() => {
     // Fetch owned documents when component mounts
     fetchOwnedDocuments();
@@ -17,44 +19,41 @@ function App() {
   async function fetchSharedDocuments() {
     const token = localStorage.getItem("token");
     try {
-      const res = await axios.get(
-        `http://localhost:8000/dc/viewShared`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        }
-      );
+      const res = await axios.get(`http://localhost:8000/dc/viewShared`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       console.log("Fetched shared documents:", res.data);
       // Update your state with the fetched documents here
-      setSharedDocuments(res.data.map(doc => ({
-        id: doc.id,
-        title: doc.title,
-        content: doc.content
-      })));
+      setSharedDocuments(
+        res.data.map((doc) => ({
+          id: doc.id,
+          title: doc.title,
+          content: doc.content,
+        }))
+      );
     } catch (error) {
- 
-        console.error("Error fetching shared documents:", error);
-      }
+      console.error("Error fetching shared documents:", error);
     }
+  }
   async function fetchOwnedDocuments() {
     const token = localStorage.getItem("token");
     try {
-      const res = await axios.get(
-        `http://localhost:8000/dc/viewAll`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        }
-      );
+      const res = await axios.get(`http://localhost:8000/dc/viewAll`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       console.log("Fetched owned documents:", res.data);
       // Update your state with the fetched documents here
-      setOwnedDocuments(res.data.map(doc => ({
-        id: doc.id,
-        title: doc.title,
-        content: doc.content
-      })));
+      setOwnedDocuments(
+        res.data.map((doc) => ({
+          id: doc.id,
+          title: doc.title,
+          content: doc.content,
+        }))
+      );
     } catch (error) {
       if (error.response.status === 403) {
         alert("Your Session expired. Logging out...");
@@ -80,17 +79,17 @@ function App() {
   };
   async function handleDelete(documentId) {
     const token = localStorage.getItem("token");
-  
+
     try {
       const res = await axios.delete(
         `http://localhost:8000/dc/delete/${documentId}`,
         {
           headers: {
-            Authorization: `Bearer ${token}`
-          }
+            Authorization: `Bearer ${token}`,
+          },
         }
       );
-  
+
       console.log("Document deleted:", res.data);
       // Update your state with the deleted document here
       setOwnedDocuments(ownedDocuments.filter((doc) => doc.id !== documentId));
@@ -101,18 +100,18 @@ function App() {
 
   async function handleRename(documentId, newName) {
     const token = localStorage.getItem("token");
-  
+
     try {
       const res = await axios.put(
         `http://localhost:8000/dc/rename/${documentId}`,
         { title: newName },
         {
           headers: {
-            Authorization: `Bearer ${token}`
-          }
+            Authorization: `Bearer ${token}`,
+          },
         }
       );
-  
+
       console.log("Document renamed:", res.data);
       // Update your state with the renamed document here
       setOwnedDocuments((docs) =>
@@ -127,18 +126,18 @@ function App() {
 
   async function handleShare(documentId, username, permission) {
     const token = localStorage.getItem("token");
-  
+
     try {
       const res = await axios.post(
         `http://localhost:8000/dc/share/${documentId}`,
         { username: username, permission: permission },
         {
           headers: {
-            Authorization: `Bearer ${token}`
-          }
-        } 
+            Authorization: `Bearer ${token}`,
+          },
+        }
       );
-  
+
       console.log("Document shared:", res.data);
       // Update your state with the shared document here
       // setSharedDocuments([...sharedDocuments, res.data]);
@@ -148,21 +147,7 @@ function App() {
   }
 
   const handleOpen = async (documentId) => {
-    const token = localStorage.getItem("token");
-  
-    try {
-      const res = await axios.get(
-        `http://localhost:8000/dc/view/${documentId}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        }
-      );
-      console.log("Opened document:", res.data);
-    } catch (error) {
-      console.error("Error opening document:", error);
-    }
+    navigate(`/dc/view/${documentId}`);
   };
 
   return (
