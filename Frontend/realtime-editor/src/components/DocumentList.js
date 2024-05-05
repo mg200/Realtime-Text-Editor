@@ -24,7 +24,7 @@ function DocumentList({ documents, onDelete, onRename, onShare, onOpen }) {
     if (selectedDocId) {
       console.log(selectedDocId, newName);
       onRename(selectedDocId, newName);
-      setRenameVisible(false); // Close the modal after renaming
+      setRenameVisible(false); 
     }
   };
   const handleOpen = (docId) => {

@@ -11,32 +11,40 @@ import { useNavigate } from "react-router-dom";
 
 function App() {
   const navigate = useNavigate();
-  useEffect(() => {
-    // Fetch owned documents when component mounts
-    fetchOwnedDocuments();
-    fetchSharedDocuments();
-  }, []);
-  async function fetchSharedDocuments() {
+  const [ownedDocuments, setOwnedDocuments] = useState([]);
+  const [sharedDocuments, setSharedDocuments] = useState([]);
+  const { isAuthenticated, logout } = useContext(AuthContext);
+  const [modalShow, setModalShow] = useState(false);
+
+  async function handleShareRequest(selectedDocId, username, permission) {
     const token = localStorage.getItem("token");
-    try {
-      const res = await axios.get(`http://localhost:8000/dc/viewShared`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      console.log("Fetched shared documents:", res.data);
-      // Update your state with the fetched documents here
-      setSharedDocuments(
-        res.data.map((doc) => ({
-          id: doc.id,
-          title: doc.title,
-          content: doc.content,
-        }))
-      );
-    } catch (error) {
-      console.error("Error fetching shared documents:", error);
+    console.log("aaaaaa", selectedDocId, username, permission);
+    if (token) {
+      try {
+        const res = await axios.post(
+          `http://localhost:8000/dc/share/${selectedDocId}`,
+          {
+            permission: permission.toUpperCase(),
+            username: username,
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        console.log("Fetched shared:", res.data);
+      } catch (error) {
+        if (error.response.status === 403) {
+          alert("Your Session expired. Logging out...");
+          logout();
+        } else {
+          console.error("Error fetching owned documents:", error);
+        }
+      }
     }
   }
+
   async function fetchOwnedDocuments() {
     const token = localStorage.getItem("token");
     if (token) {
@@ -66,10 +74,34 @@ function App() {
       }
     }
   }
-  const [ownedDocuments, setOwnedDocuments] = useState([]);
-  const [sharedDocuments, setSharedDocuments] = useState([]);
-  const { isAuthenticated, logout } = useContext(AuthContext);
-  const [modalShow, setModalShow] = useState(false);
+  async function fetchSharedDocuments() {
+    const token = localStorage.getItem("token");
+    if (token) {
+      try {
+        const res = await axios.get(`http://localhost:8000/dc/viewShared`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        console.log("Fetched shared documents:", res.data);
+        setSharedDocuments(
+          res.data.map((doc) => ({
+            id: doc.id,
+            title: doc.title,
+            content: doc.content,
+          }))
+        );
+      } catch (error) {
+        if (error.response.status === 403) {
+          alert("Your Session expired. Logging out...");
+          // console.error("Token expired. Logging out...");
+          logout();
+        } else {
+          console.error("Error fetching owned documents:", error);
+        }
+      }
+    }
+  }
 
   const handleOpenModal = () => setModalShow(true);
   const handleCloseModal = () => setModalShow(false);
@@ -126,31 +158,14 @@ function App() {
     }
   }
 
-  async function handleShare(documentId, username, permission) {
-    const token = localStorage.getItem("token");
-
-    try {
-      const res = await axios.post(
-        `http://localhost:8000/dc/share/${documentId}`,
-        { username: username, permission: permission },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      console.log("Document shared:", res.data);
-      // Update your state with the shared document here
-      // setSharedDocuments([...sharedDocuments, res.data]);
-    } catch (error) {
-      console.error("Error sharing document:", error);
-    }
-  }
-
   const handleOpen = async (documentId) => {
     navigate(`/dc/view/${documentId}`);
   };
+  useEffect(() => {
+    // Fetch owned documents when component mounts
+    fetchOwnedDocuments();
+    fetchSharedDocuments();
+  }, []);
 
   return (
     <>
@@ -176,7 +191,7 @@ function App() {
             documents={ownedDocuments}
             onDelete={handleDelete}
             onRename={handleRename}
-            onShare={handleShare}
+            onShare={handleShareRequest}
             onOpen={handleOpen}
           />
 
@@ -185,7 +200,7 @@ function App() {
             documents={sharedDocuments}
             onDelete={handleDelete}
             onRename={handleRename}
-            onShare={handleShare}
+            onShare={handleShareRequest}
             onOpen={handleOpen}
           />
         </div>

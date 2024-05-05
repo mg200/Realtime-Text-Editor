@@ -135,6 +135,8 @@ public class DocumentController {
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<?> deleteDocument(@PathVariable String id,
             @RequestHeader("Authorization") String token) {
+
+        
         String actualToken = token.replace("Bearer ", "");
         String username = jwtService.extractUsername(actualToken);
         Optional<Documents> documentOptional = documentService.getDocumentById(id);
@@ -155,6 +157,9 @@ public class DocumentController {
     @PostMapping("/share/{id}")
     public ResponseEntity<?> shareDocument(@PathVariable String id, @RequestBody ShareDocumentRequest shareRequest,
             @RequestHeader("Authorization") String token) {
+                
+        System.out.println("aywaaaaaaaaaaaaaaaaaaaaaaaaaaaaa hnaaaaaaaaaaaaaaaaaaaaaaaaa");
+
         String actualToken = token.replace("Bearer ", "");
         System.out.println("Document ID: " + id);
         System.out.println("Document usernameaaa: ");
