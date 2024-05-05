@@ -33,8 +33,17 @@ public class SocketConnectionHandler extends TextWebSocketHandler {
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
         super.afterConnectionClosed(session, status);
-        if (documentRooms != null && documentRooms.contains(session)) {
+        if (!documentRooms.isEmpty() && documentRooms.contains(session)) {
+            System.out.println("HENAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
             documentRooms.remove(session);
+            removeSessionFromRooms(session);
+            System.out.println("   B3d    HENAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
+        }
+    }
+    
+    private void removeSessionFromRooms(WebSocketSession session) {
+        for (List<WebSocketSession> sessions : roomSessions.values()) {
+            sessions.remove(session);
         }
     }
 
@@ -43,6 +52,7 @@ public class SocketConnectionHandler extends TextWebSocketHandler {
         super.handleTextMessage(session, message);
         String roomId = getDocumentId(message); // You need to implement this method
         
+        System.out.println("sssssssssssssssssssssssss"+roomId);
         // Add the session to the room's list
         if (!roomSessions.containsKey(roomId)) {
             roomSessions.put(roomId, new ArrayList<>());
@@ -54,15 +64,23 @@ public class SocketConnectionHandler extends TextWebSocketHandler {
 
     private void sendMessage(String roomId, TextMessage message) {
         if (roomSessions.containsKey(roomId)) {
-            for (WebSocketSession session : roomSessions.get(roomId)) {
+            List<WebSocketSession> sessions = roomSessions.get(roomId);
+            System.out.println("sessionnn          "+sessions);
+            for (WebSocketSession session : sessions) {
                 try {
-                    session.sendMessage(message);
+                    if (session.isOpen()) {
+                        session.sendMessage(message);
+                    } else {
+                        roomSessions.remove(roomId, session);
+                    }
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
             }
+            
         }
     }
+    
 
     private String getDocumentId(TextMessage message) throws IOException {
         ObjectMapper mapper = new ObjectMapper();
@@ -70,5 +88,5 @@ public class SocketConnectionHandler extends TextWebSocketHandler {
         System.out.println("Document ID: " + map.get("documentId"));
         return map.get("documentId");
     }
-    
+
 }
