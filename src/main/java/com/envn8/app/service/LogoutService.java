@@ -28,6 +28,7 @@ public class LogoutService implements LogoutHandler {
         jwt = authHeader.substring(7);
         var sharedToken = tokenRepository.findByToken(jwt)
                 .orElse(null);
+        System.out.println("sharedToken: " + sharedToken);
         if (sharedToken != null) {
             sharedToken.setExpired(true);
             sharedToken.setRevoked(true);

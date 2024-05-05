@@ -28,10 +28,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
-
 @Data
 @Builder
-@NoArgsConstructor //might need to be removed 
+@NoArgsConstructor // might need to be removed
 @AllArgsConstructor
 @Entity
 @Document(collection = "users")
@@ -61,21 +60,24 @@ public class User implements UserDetails {
 
     @Enumerated(EnumType.STRING)
     private Role role;
-   //note as of 27/4, I initialized these lists to avoid null pointer exceptions, might need to be removed
+    // note as of 27/4, I initialized these lists to avoid null pointer exceptions,
+    // might need to be removed
     @DBRef
-    private List<Documents> documents=new ArrayList<>(); // This represents the documents that the user owns
+    private List<Documents> documents = new ArrayList<>(); // This represents the documents that the user owns
+    
     @DBRef
     @JsonManagedReference
-    private List<Documents> sharedDocuments=new ArrayList<>(); // This represents the documents that are shared with the user
+    private List<Documents> sharedDocuments = new ArrayList<>(); // This represents the documents that are shared with
+                                                                 // the user
 
     @DBRef
-    private List<Token>tokens;
+    private List<Token> tokens;
 
     @Override
     public String getUsername() {
         return username;
     }
-    
+
     public String getId() {
         return id;
     }
@@ -101,7 +103,7 @@ public class User implements UserDetails {
     }
 
     // public String getUsername() {
-    //     return username;
+    // return username;
     // }
 
     public void setUsername(String username) {
@@ -172,7 +174,5 @@ public class User implements UserDetails {
     public boolean isEnabled() {
         return true;
     }
-
-    
 
 }
