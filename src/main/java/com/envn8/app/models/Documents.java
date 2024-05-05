@@ -9,7 +9,9 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -33,9 +35,13 @@ public class Documents {
     private String type;
 
     @DBRef
-    @JsonIgnore
+    // @JsonIgnore
+    @JsonBackReference
     private User owner;
     
+    @DBRef
+    // @JsonManagedReference
+    @JsonBackReference//this worked
     private List<User> sharedWith; // This represents the users that the document is shared with
     // private Map<String, String> permissions; // This represents the permissions of the shared users
     // key is the user id and value is the permission level

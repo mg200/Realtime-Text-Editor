@@ -26,6 +26,8 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 
 @Data
 @Builder
@@ -62,22 +64,12 @@ public class User implements UserDetails {
    //note as of 27/4, I initialized these lists to avoid null pointer exceptions, might need to be removed
     @DBRef
     private List<Documents> documents=new ArrayList<>(); // This represents the documents that the user owns
+    @DBRef
+    @JsonManagedReference
     private List<Documents> sharedDocuments=new ArrayList<>(); // This represents the documents that are shared with the user
 
     @DBRef
     private List<Token>tokens;
-    // public User() {
-        // this.documents = new java.util.ArrayList<Documents>();
-        // this.sharedDocuments = new java.util.ArrayList<Documents>();
-    // }
-
-    // public User(String username, String password) {
-    //     // this.username = username;
-        
-    //     this.password = password;
-    //     this.documents = new java.util.ArrayList<Documents>();
-    //     this.sharedDocuments = new java.util.ArrayList<Documents>();
-    // }
 
     @Override
     public String getUsername() {
@@ -156,8 +148,8 @@ public class User implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        System.out.println("Role: " + role+"exception here ");
-        System.out.println("Role: " + role.name());
+        // System.out.println("Role: " + role+"exception here ");
+        // System.out.println("Role: " + role.name());
         return List.of(new SimpleGrantedAuthority(role.name()));
     }
 

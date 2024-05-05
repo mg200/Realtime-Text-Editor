@@ -13,7 +13,9 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import com.envn8.app.models.Documents;
 import com.envn8.app.models.User;
@@ -56,17 +58,6 @@ public class DocumentController {
             return new ResponseEntity<>("User not found", HttpStatus.UNAUTHORIZED);
         }
 
-
-        // Create the document
-        // Documents document = new Documents();
-        // document.setContent(documentRequest.getContent());
-        // document.setTitle(documentRequest.getTitle());
-        // document.setType(documentRequest.getType());
-
-        // // Get the User object from the UserDetails
-        // User user = (User) userDetails;
-        // document.setOwner(user);
-        
         User user = (User) userDetails;
         Documents document = Documents.builder().content(documentRequest.getContent()).title(documentRequest.getTitle())
                 .type(documentRequest.getType())
@@ -162,7 +153,6 @@ public class DocumentController {
 
         String actualToken = token.replace("Bearer ", "");
         System.out.println("Document ID: " + id);
-        System.out.println("Document usernameaaa: ");
 
         String ownerUsername = jwtService.extractUsername(actualToken);
         Optional<Documents> documentOptional = documentService.getDocumentById(id);
@@ -178,6 +168,8 @@ public class DocumentController {
                     document.getPermissions().put(user.getId(), shareRequest.getPermission());
                     documentService.createDocument(document);
                     user.getSharedDocuments().add(document);
+                    userService.saveUser(user);
+                    System.out.println("sharedDocuments size" + user.getSharedDocuments().size());
                     return new ResponseEntity<>("Document shared successfully", HttpStatus.OK);
                 } else {
                     return new ResponseEntity<>("User not found", HttpStatus.NOT_FOUND);
@@ -190,13 +182,19 @@ public class DocumentController {
         }
     }
 
+    // @GetMapping("/getSharedDocuments")
+    // public ResponseEntity<Iterable<Documents>>getSharedDocument
+
     @GetMapping("/viewShared")
     public ResponseEntity<Iterable<Documents>> viewSharedDocuments(@RequestHeader("Authorization") String token) {
         String actualToken = token.replace("Bearer ", "");
         String username = jwtService.extractUsername(actualToken);
         User user = userService.getUserByUsername(username); // Get the current user
         if (user != null) {
+            System.out.println("User is not null");
             Iterable<Documents> sharedDocuments = user.getSharedDocuments();
+            System.out.println("Shared documents size" + sharedDocuments.spliterator().getExactSizeIfKnown());
+            sharedDocuments.forEach(doc -> System.out.println(doc.getTitle()));
             return new ResponseEntity<>(sharedDocuments, HttpStatus.OK);
         } else {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
@@ -213,6 +211,35 @@ public class DocumentController {
             return new ResponseEntity<>(document.getOwner().getUsername(), HttpStatus.OK);
         } else {
             return new ResponseEntity<>("Document not found", HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @GetMapping("/getSharedWith/{id}")
+    public ResponseEntity<Iterable<String>> getSharedWith(@PathVariable String id,
+            @RequestHeader("Authorization") String token) {
+        String actualToken = token.replace("Bearer ", "");
+        System.out.println("Document ID: " + id);
+
+        String ownerUsername = jwtService.extractUsername(actualToken);
+        Optional<Documents> documentOptional = documentService.getDocumentById(id);
+
+        if (documentOptional.isPresent()) {
+            Documents document = documentOptional.get();
+
+            //check if the user is in this document's sharedWith list or its owner 
+            if(!document.getType().equals("public") && 
+                !documentOptional.get().getOwner().getUsername().equals(ownerUsername) 
+            && !documentOptional.get().getSharedWith().stream().anyMatch(user -> user.getUsername()
+            .equals(ownerUsername))){
+                return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+            }
+
+            List<String> usernames = document.getSharedWith().stream()
+                    .map(User::getUsername)
+                    .collect(Collectors.toList());
+            return new ResponseEntity<>(usernames, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
 
@@ -262,10 +289,11 @@ public class DocumentController {
 
     // @MessageMapping("/document/{documentId}")
     // @SendTo("/topic/document/{documentId}/content")
-    // public String editDocument(@DestinationVariable String documentId, String content) {
-    //     System.out.println("aywaa ya sahbyyy");
-       
-    //     return content;
+    // public String editDocument(@DestinationVariable String documentId, String
+    // content) {
+    // System.out.println("aywaa ya sahbyyy");
+
+    // return content;
     // }
 
 }
