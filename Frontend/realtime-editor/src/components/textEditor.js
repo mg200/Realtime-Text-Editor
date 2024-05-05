@@ -70,14 +70,14 @@ const TextEditor = () => {
       const data = { documentId: documentId, content: "" };
       const jsonData = JSON.stringify(data);
       socket.send(jsonData);
-
     };
 
     socket.onmessage = (event) => {
-      // const receivedMessage = JSON.parse(event.data);
       console.log("aywaaa ya habeeb akhook", event.data);
-      setContent(event.data.content);
-      // setMessages((prev) => [...prev, receivedMessage]);
+      const eventData = JSON.parse(event.data);
+      const receivedContent = eventData.content;
+      setContent(receivedContent);
+      // console.log("aywaaa ya habeeb akhoo00000000000000k", content);
     };
     socket.onerror = (error) => {
       console.error("WebSocket error:", error);
@@ -98,7 +98,7 @@ const TextEditor = () => {
       };
 
       const jsonData = JSON.stringify(data);
-      socket.send((jsonData));
+      socket.send(jsonData);
     }
   };
 
@@ -113,13 +113,12 @@ const TextEditor = () => {
   });
   useEffect(() => {
     // Update the editor's content when setContent is updated
+    console.log("Sssssssssssssssssss");
     if (editor) {
+      console.log("Sssssssssssssss");
       editor.commands.setContent(content);
     }
-  }, [content, editor]);
-  // useEffect(() => {
-  //   editor.commands.setContent(content);
-  // }, [content, editor]);
+  }, [content]);
 
   if (isLoading) {
     return <div>Loading...</div>;

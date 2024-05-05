@@ -38,14 +38,6 @@ public class SocketConnectionHandler extends TextWebSocketHandler {
         }
     }
 
-    // @Override
-    // protected void handleTextMessage(WebSocketSession session, TextMessage
-    // message) throws Exception {
-    // super.handleTextMessage(session, message);
-    // String roomId = getDocumentId(message); // Assuming you have a method to get
-    // the room ID
-
-    // }
     @Override
     protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
         super.handleTextMessage(session, message);
@@ -72,16 +64,11 @@ public class SocketConnectionHandler extends TextWebSocketHandler {
         }
     }
 
-    // private String getDocumentId(TextMessage message) throws IOException {
-    //     // message.getPayload().documentId;
-    //     System.out.println("Document ID: " + message.getPayload();
-    //     return message.getPayload();
-    // }
-
     private String getDocumentId(TextMessage message) throws IOException {
         ObjectMapper mapper = new ObjectMapper();
         Map<String, String> map = mapper.readValue(message.getPayload(), Map.class);
         System.out.println("Document ID: " + map.get("documentId"));
         return map.get("documentId");
     }
+    
 }
