@@ -112,7 +112,6 @@ const TextEditor = () => {
     },
   });
   useEffect(() => {
-    // Update the editor's content when setContent is updated
     console.log("Sssssssssssssssssss");
     if (editor) {
       console.log("Sssssssssssssss");
