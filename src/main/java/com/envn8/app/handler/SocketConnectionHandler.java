@@ -22,9 +22,10 @@ public class SocketConnectionHandler extends TextWebSocketHandler {
 
     private static final List<WebSocketSession> documentRooms = new ArrayList<WebSocketSession>();
     private Map<String, List<WebSocketSession>> roomSessions = new HashMap<>();
-
+    
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
+        System.out.println("Connection established");
         super.afterConnectionEstablished(session);
         documentRooms.add(session);
 
@@ -32,6 +33,8 @@ public class SocketConnectionHandler extends TextWebSocketHandler {
 
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
+        System.out.println("afterConnectionClosed");
+
         super.afterConnectionClosed(session, status);
         if (documentRooms != null && documentRooms.contains(session)) {
             documentRooms.remove(session);
@@ -48,6 +51,7 @@ public class SocketConnectionHandler extends TextWebSocketHandler {
             roomSessions.put(roomId, new ArrayList<>());
         }
         roomSessions.get(roomId).add(session);
+        System.out.println("rommSessions: " + roomSessions);
         sendMessage(roomId, message);
 
     }
