@@ -1,15 +1,15 @@
 version: '3'
 services:
   front:
-    container_name: front
+    container_name: aptfront
     image: hassanhatem/aptfront:latest
     restart: always
   api:
-    container_name: api
+    container_name: aptback
     image: hassanhatem/aptback:latest
     restart: on-failure
   nginx:
-    container_name: nginx
+    container_name: aptnginx
     depends_on: # wait for the backend and frontend to start
     - front
     - api
