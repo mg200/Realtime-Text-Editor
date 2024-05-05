@@ -67,7 +67,12 @@ const TextEditor = () => {
     const socket = new WebSocket(`ws://localhost:8000/topic`);
     socket.onopen = () => {
       console.log("WebSocket connected");
+      const data = { documentId: documentId, content: "" };
+      const jsonData = JSON.stringify(data);
+      socket.send(jsonData);
+
     };
+
     socket.onmessage = (event) => {
       // const receivedMessage = JSON.parse(event.data);
       console.log("aywaaa ya habeeb akhook", event.data);
@@ -91,7 +96,9 @@ const TextEditor = () => {
         documentId: documentId,
         content: content,
       };
-      socket.send(JSON.stringify(data));
+
+      const jsonData = JSON.stringify(data);
+      socket.send((jsonData));
     }
   };
 
