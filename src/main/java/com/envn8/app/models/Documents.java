@@ -11,6 +11,16 @@ import org.springframework.data.mongodb.core.mapping.Field;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+// import lombok.RequiredArgsConstructor;
+@Data
+@Builder
+@NoArgsConstructor
+// @RequiredArgsConstructor
+@AllArgsConstructor
 @Document
 public class Documents {
     @Id
@@ -27,11 +37,12 @@ public class Documents {
     private User owner;
     
     private List<User> sharedWith; // This represents the users that the document is shared with
-    private Map<String, String> permissions; // This represents the permissions of the shared users
+    // private Map<String, String> permissions; // This represents the permissions of the shared users
     // key is the user id and value is the permission level
 
-    public Documents() {
-    }
+    private Map<String,DocPermissions> permissions;
+    // public Documents() {
+    // }
 
     public Documents(String title, String content, String type, User owner) {
         this.title = title;
@@ -89,11 +100,11 @@ public class Documents {
         this.sharedWith = sharedWith;
     }
 
-    public Map<String, String> getPermissions() {
-        return permissions;
-    }
+    // public Map<String, String> getPermissions() {
+    //     return permissions;
+    // }
 
-    public void setPermissions(Map<String, String> permissions) {
-        this.permissions = permissions;
-    }
+    // public void setPermissions(Map<String, String> permissions) {
+    //     this.permissions = permissions;
+    // }
 }

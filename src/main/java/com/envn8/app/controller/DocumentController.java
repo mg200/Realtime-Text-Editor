@@ -10,6 +10,9 @@ import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Optional;
 
 import com.envn8.app.models.Documents;
@@ -23,7 +26,6 @@ import com.envn8.app.payload.request.DocumentRequest;
 import com.envn8.app.payload.request.ShareDocumentRequest;
 import com.envn8.app.security.config.JwtService;
 import org.slf4j.Logger;
-
 
 @RestController
 @RequestMapping("/dc")
@@ -41,7 +43,7 @@ public class DocumentController {
     @PostMapping("/create")
     public ResponseEntity<?> createDocument(@RequestBody DocumentRequest documentRequest,
             @RequestHeader("Authorization") String token) {
-        System.out.println("at the start of createDocument_temp()");
+        // System.out.println("at the start of createDocument_temp()");
         if (token == null || token.isEmpty()) {
             return new ResponseEntity<>("Token is null or empty", HttpStatus.UNAUTHORIZED);
         }
@@ -54,15 +56,24 @@ public class DocumentController {
             return new ResponseEntity<>("User not found", HttpStatus.UNAUTHORIZED);
         }
 
-        // Create the document
-        Documents document = new Documents();
-        document.setContent(documentRequest.getContent());
-        document.setTitle(documentRequest.getTitle());
-        document.setType(documentRequest.getType());
 
-        // Get the User object from the UserDetails
+        // Create the document
+        // Documents document = new Documents();
+        // document.setContent(documentRequest.getContent());
+        // document.setTitle(documentRequest.getTitle());
+        // document.setType(documentRequest.getType());
+
+        // // Get the User object from the UserDetails
+        // User user = (User) userDetails;
+        // document.setOwner(user);
+        
         User user = (User) userDetails;
-        document.setOwner(user);
+        Documents document = Documents.builder().content(documentRequest.getContent()).title(documentRequest.getTitle())
+                .type(documentRequest.getType())
+                .owner(user)
+                .permissions(new HashMap<>())
+                .sharedWith(new ArrayList<>())
+                .build();
 
         // Add the document to the user's documents
         user.getDocuments().add(document);
@@ -223,12 +234,13 @@ public class DocumentController {
             return new ResponseEntity<>("Document not found", HttpStatus.NOT_FOUND);
         }
     }
+
     @GetMapping("/dc/view/{id}")
     public ResponseEntity<?> getDocumentContent(@PathVariable String id) {
         Optional<Documents> documentOptional = documentService.getDocumentById(id);
         if (documentOptional.isPresent()) {
-             Documents document = documentOptional.get();
-             String content = document.getContent(); // Assuming content is a property of Documents entity
+            Documents document = documentOptional.get();
+            String content = document.getContent(); // Assuming content is a property of Documents entity
             return new ResponseEntity<>("aloooo ya habeby", HttpStatus.OK);
         } else {
             return new ResponseEntity<>("Document not found", HttpStatus.NOT_FOUND);
@@ -237,8 +249,10 @@ public class DocumentController {
     // @Autowired
     // private SimpMessagingTemplate messagingTemplate;
 
-    // public void broadcastDocumentUpdate(String documentId, String updateMessage) {
-    //     messagingTemplate.convertAndSend("/topic/document/" + documentId, updateMessage);
+    // public void broadcastDocumentUpdate(String documentId, String updateMessage)
+    // {
+    // messagingTemplate.convertAndSend("/topic/document/" + documentId,
+    // updateMessage);
     // }
 
     // @MessageMapping("/document/{documentId}")
