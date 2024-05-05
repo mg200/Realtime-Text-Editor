@@ -145,12 +145,18 @@ public class DocumentController {
     public ResponseEntity<?> shareDocument(@PathVariable String id, @RequestBody ShareDocumentRequest shareRequest,
             @RequestHeader("Authorization") String token) {
         String actualToken = token.replace("Bearer ", "");
+        System.out.println("Document ID: " + id);
+        System.out.println("Document usernameaaa: ");
+
         String ownerUsername = jwtService.extractUsername(actualToken);
         Optional<Documents> documentOptional = documentService.getDocumentById(id);
+
         if (documentOptional.isPresent()) {
             Documents document = documentOptional.get();
+
             if (document.getOwner().getUsername().equals(ownerUsername)) {
                 User user = userService.getUserByUsername(shareRequest.getUsername());
+
                 if (user != null) {
                     document.getSharedWith().add(user);
                     document.getPermissions().put(user.getId(), shareRequest.getPermission());
@@ -185,6 +191,7 @@ public class DocumentController {
     public ResponseEntity<?> getDocumentOwner(@PathVariable String id) {
         System.out.println("getDocumentOwner() called");
         Optional<Documents> documentOptional = documentService.getDocumentById(id);
+
         if (documentOptional.isPresent()) {
             Documents document = documentOptional.get();
             return new ResponseEntity<>(document.getOwner().getUsername(), HttpStatus.OK);
@@ -234,12 +241,12 @@ public class DocumentController {
     //     messagingTemplate.convertAndSend("/topic/document/" + documentId, updateMessage);
     // }
 
-    @MessageMapping("/document/{documentId}")
-    @SendTo("/topic/document/{documentId}/content")
-    public String editDocument(@DestinationVariable String documentId, String content) {
-        System.out.println("aywaa ya sahbyyy");
+    // @MessageMapping("/document/{documentId}")
+    // @SendTo("/topic/document/{documentId}/content")
+    // public String editDocument(@DestinationVariable String documentId, String content) {
+    //     System.out.println("aywaa ya sahbyyy");
        
-        return content;
-    }
+    //     return content;
+    // }
 
 }
