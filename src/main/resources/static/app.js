@@ -2,7 +2,7 @@ let ws, currentUser;
 
 // On pressing Connect this method will be called
 function connect() {
-  ws = new WebSocket("ws://localhost:8080/hello");
+  ws = new WebSocket("ws://hmamdocs.me/api/topic");
 
   //This function will called everytime new message arrives
   ws.onmessage = function (e) {
