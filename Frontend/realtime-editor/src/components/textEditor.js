@@ -38,7 +38,7 @@ const extensions = [
 
 const fetchContent = async (documentId) => {
   const token = localStorage.getItem("token");
-  const res = await axios.get(`http://51.103.213.89/dc/view/${documentId}`, {
+  const res = await axios.get(`http://hmamdocs.me/api/dc/view/${documentId}`, {
     headers: {
       Authorization: `Bearer ${token}`,
     },

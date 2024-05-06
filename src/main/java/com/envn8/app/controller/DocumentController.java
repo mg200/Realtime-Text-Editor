@@ -30,7 +30,7 @@ import com.envn8.app.security.config.JwtService;
 import org.slf4j.Logger;
 
 @RestController
-@RequestMapping("/dc")
+@RequestMapping("/api/dc")
 @RequiredArgsConstructor
 public class DocumentController {
     private static final Logger logger = LoggerFactory.getLogger(DocumentController.class);
@@ -101,6 +101,7 @@ public class DocumentController {
 
     @GetMapping("/viewAll")
     public ResponseEntity<Iterable<Documents>> viewAllDocuments(@RequestHeader("Authorization") String token) {
+        System.out.println("at the start of viewAllDocuments()");
         String actualToken = token.replace("Bearer ", "");
         String username = jwtService.extractUsername(actualToken);
         System.out.println("username: " + username + " token: " + actualToken);
