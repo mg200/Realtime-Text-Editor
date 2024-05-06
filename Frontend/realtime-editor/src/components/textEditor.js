@@ -65,6 +65,9 @@ const TextEditor = () => {
 
   useEffect(() => {
     const socket = new WebSocket(`ws://hmamdocs.me/api/topic`);
+    // socket.onerror = function(event) {
+    //   console.error("WebSocket error observed:", event);
+    // };
     socket.onopen = () => {
       console.log("WebSocket connected");
       const data = { documentId: documentId, content: "" };
