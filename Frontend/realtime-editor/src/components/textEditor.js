@@ -64,7 +64,7 @@ const TextEditor = () => {
   }, [Document]);
 
   useEffect(() => {
-    const socket = new WebSocket(`ws://hmamdocs.me/topic`);
+    const socket = new WebSocket(`ws://hmamdocs.me/api/topic`);
     socket.onopen = () => {
       console.log("WebSocket connected");
       const data = { documentId: documentId, content: "" };
