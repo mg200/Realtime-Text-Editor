@@ -21,12 +21,15 @@ import com.envn8.app.models.Documents;
 import com.envn8.app.models.User;
 import com.envn8.app.service.DocumentService;
 import com.envn8.app.service.UserService;
+import com.fasterxml.jackson.databind.ext.OptionalHandlerFactory;
 
 import lombok.RequiredArgsConstructor;
 
 import com.envn8.app.payload.request.DocumentRequest;
 import com.envn8.app.payload.request.ShareDocumentRequest;
 import com.envn8.app.security.config.JwtService;
+
+import org.apache.catalina.connector.Response;
 import org.slf4j.Logger;
 
 @RestController
@@ -45,7 +48,7 @@ public class DocumentController {
     @PostMapping("/create")
     public ResponseEntity<?> createDocument(@RequestBody DocumentRequest documentRequest,
             @RequestHeader("Authorization") String token) {
-        // System.out.println("at the start of createDocument_temp()");
+        System.out.println("at the start of createDocument_temp()");
         if (token == null || token.isEmpty()) {
             return new ResponseEntity<>("Token is null or empty", HttpStatus.UNAUTHORIZED);
         }
@@ -128,7 +131,6 @@ public class DocumentController {
     public ResponseEntity<?> deleteDocument(@PathVariable String id,
             @RequestHeader("Authorization") String token) {
 
-        
         String actualToken = token.replace("Bearer ", "");
         String username = jwtService.extractUsername(actualToken);
         Optional<Documents> documentOptional = documentService.getDocumentById(id);
@@ -149,11 +151,12 @@ public class DocumentController {
     @PostMapping("/share/{id}")
     public ResponseEntity<?> shareDocument(@PathVariable String id, @RequestBody ShareDocumentRequest shareRequest,
             @RequestHeader("Authorization") String token) {
-                
-        System.out.println("aywaaaaaaaaaaaaaaaaaaaaaaaaaaaaa hnaaaaaaaaaaaaaaaaaaaaaaaaa");
+
+        // System.out.println("aywaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+        // hnaaaaaaaaaaaaaaaaaaaaaaaaa");
 
         String actualToken = token.replace("Bearer ", "");
-        System.out.println("Document ID: " + id);
+        // System.out.println("Document ID: " + id);
 
         String ownerUsername = jwtService.extractUsername(actualToken);
         Optional<Documents> documentOptional = documentService.getDocumentById(id);
@@ -170,7 +173,8 @@ public class DocumentController {
                     documentService.createDocument(document);
                     user.getSharedDocuments().add(document);
                     userService.saveUser(user);
-                    System.out.println("sharedDocuments size" + user.getSharedDocuments().size());
+                    // System.out.println("sharedDocuments size" +
+                    // user.getSharedDocuments().size());
                     return new ResponseEntity<>("Document shared successfully", HttpStatus.OK);
                 } else {
                     return new ResponseEntity<>("User not found", HttpStatus.NOT_FOUND);
@@ -183,8 +187,6 @@ public class DocumentController {
         }
     }
 
-    // @GetMapping("/getSharedDocuments")
-    // public ResponseEntity<Iterable<Documents>>getSharedDocument
 
     @GetMapping("/viewShared")
     public ResponseEntity<Iterable<Documents>> viewSharedDocuments(@RequestHeader("Authorization") String token) {
@@ -192,10 +194,11 @@ public class DocumentController {
         String username = jwtService.extractUsername(actualToken);
         User user = userService.getUserByUsername(username); // Get the current user
         if (user != null) {
-            System.out.println("User is not null");
+            // System.out.println("User is not null");
             Iterable<Documents> sharedDocuments = user.getSharedDocuments();
-            System.out.println("Shared documents size" + sharedDocuments.spliterator().getExactSizeIfKnown());
-            sharedDocuments.forEach(doc -> System.out.println(doc.getTitle()));
+            // System.out.println("Shared documents size" +
+            // sharedDocuments.spliterator().getExactSizeIfKnown());
+            // sharedDocuments.forEach(doc -> System.out.println(doc.getTitle()));
             return new ResponseEntity<>(sharedDocuments, HttpStatus.OK);
         } else {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
@@ -204,7 +207,7 @@ public class DocumentController {
 
     @GetMapping("/getDocumentOwner/{id}")
     public ResponseEntity<?> getDocumentOwner(@PathVariable String id) {
-        System.out.println("getDocumentOwner() called");
+        // System.out.println("getDocumentOwner() called");
         Optional<Documents> documentOptional = documentService.getDocumentById(id);
 
         if (documentOptional.isPresent()) {
@@ -219,7 +222,7 @@ public class DocumentController {
     public ResponseEntity<Iterable<String>> getSharedWith(@PathVariable String id,
             @RequestHeader("Authorization") String token) {
         String actualToken = token.replace("Bearer ", "");
-        System.out.println("Document ID: " + id);
+        // System.out.println("Document ID: " + id);
 
         String ownerUsername = jwtService.extractUsername(actualToken);
         Optional<Documents> documentOptional = documentService.getDocumentById(id);
@@ -227,11 +230,11 @@ public class DocumentController {
         if (documentOptional.isPresent()) {
             Documents document = documentOptional.get();
 
-            //check if the user is in this document's sharedWith list or its owner 
-            if(!document.getType().equals("public") && 
-                !documentOptional.get().getOwner().getUsername().equals(ownerUsername) 
-            && !documentOptional.get().getSharedWith().stream().anyMatch(user -> user.getUsername()
-            .equals(ownerUsername))){
+            // check if the user is in this document's sharedWith list or its owner
+            if (!document.getType().equals("public") &&
+                    !documentOptional.get().getOwner().getUsername().equals(ownerUsername)
+                    && !documentOptional.get().getSharedWith().stream().anyMatch(user -> user.getUsername()
+                            .equals(ownerUsername))) {
                 return new ResponseEntity<>(HttpStatus.FORBIDDEN);
             }
 
@@ -277,6 +280,47 @@ public class DocumentController {
             return new ResponseEntity<>("aloooo ya habeby", HttpStatus.OK);
         } else {
             return new ResponseEntity<>("Document not found", HttpStatus.NOT_FOUND);
+        }
+    }
+
+    //only owner can make document public or private
+    @PutMapping("makePublic/{id}")
+    public ResponseEntity<?> makeDocumentPublic(@PathVariable String id, 
+    @RequestHeader("Authorization") String token) {
+        String actualToken = token.replace("Bearer ", "");
+        String username = jwtService.extractUsername(actualToken);
+        Optional<Documents> documentOptional = documentService.getDocumentById(id);
+        if(documentOptional.isPresent()){
+            Documents document = documentOptional.get();
+            if(document.getOwner().getUsername().equals(username)){
+                document.setType("public");
+                documentService.updateDocument(document);
+                return ResponseEntity.status(HttpStatus.OK).body("Document is now public");
+            }else{
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You are not the owner of the document");
+            }
+        }else{
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Document not found");
+        }
+    }
+
+    @PutMapping("makePrivate/{id}")
+    public ResponseEntity<?> makeDocumentPrivate(@PathVariable String id, 
+    @RequestHeader("Authorization") String token) {
+        String actualToken = token.replace("Bearer ", "");
+        String username = jwtService.extractUsername(actualToken);
+        Optional<Documents> documentOptional = documentService.getDocumentById(id);
+        if(documentOptional.isPresent()){
+            Documents document = documentOptional.get();
+            if(document.getOwner().getUsername().equals(username)){
+                document.setType("private");
+                documentService.updateDocument(document);
+                return ResponseEntity.status(HttpStatus.OK).body("Document is now private");
+            }else{
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You are not the owner of the document");
+            }
+        }else{
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Document not found");
         }
     }
     // @Autowired
