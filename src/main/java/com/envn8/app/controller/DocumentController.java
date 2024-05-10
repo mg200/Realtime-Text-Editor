@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import com.envn8.app.models.CRDT;
 import com.envn8.app.models.Documents;
 import com.envn8.app.models.User;
 import com.envn8.app.service.DocumentService;
@@ -62,13 +63,16 @@ public class DocumentController {
         }
 
         User user = (User) userDetails;
-        Documents document = Documents.builder().content(documentRequest.getContent()).title(documentRequest.getTitle())
+        List<CRDT> content = new ArrayList<>(); // as initially the document is empty
+
+        Documents document = Documents.builder()
+                .content(content)
+                .title(documentRequest.getTitle())
                 .type(documentRequest.getType())
                 .owner(user)
                 .permissions(new HashMap<>())
                 .sharedWith(new ArrayList<>())
                 .build();
-
         // Add the document to the user's documents
         user.getDocuments().add(document);
 
@@ -187,7 +191,6 @@ public class DocumentController {
         }
     }
 
-
     @GetMapping("/viewShared")
     public ResponseEntity<Iterable<Documents>> viewSharedDocuments(@RequestHeader("Authorization") String token) {
         String actualToken = token.replace("Bearer ", "");
@@ -276,50 +279,50 @@ public class DocumentController {
         Optional<Documents> documentOptional = documentService.getDocumentById(id);
         if (documentOptional.isPresent()) {
             Documents document = documentOptional.get();
-            String content = document.getContent(); // Assuming content is a property of Documents entity
+            List<CRDT> content = document.getContent(); // Assuming content is a property of Documents entity
             return new ResponseEntity<>("aloooo ya habeby", HttpStatus.OK);
         } else {
             return new ResponseEntity<>("Document not found", HttpStatus.NOT_FOUND);
         }
     }
 
-    //only owner can make document public or private
+    // only owner can make document public or private
     @PutMapping("makePublic/{id}")
-    public ResponseEntity<?> makeDocumentPublic(@PathVariable String id, 
-    @RequestHeader("Authorization") String token) {
+    public ResponseEntity<?> makeDocumentPublic(@PathVariable String id,
+            @RequestHeader("Authorization") String token) {
         String actualToken = token.replace("Bearer ", "");
         String username = jwtService.extractUsername(actualToken);
         Optional<Documents> documentOptional = documentService.getDocumentById(id);
-        if(documentOptional.isPresent()){
+        if (documentOptional.isPresent()) {
             Documents document = documentOptional.get();
-            if(document.getOwner().getUsername().equals(username)){
+            if (document.getOwner().getUsername().equals(username)) {
                 document.setType("public");
                 documentService.updateDocument(document);
                 return ResponseEntity.status(HttpStatus.OK).body("Document is now public");
-            }else{
+            } else {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You are not the owner of the document");
             }
-        }else{
+        } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Document not found");
         }
     }
 
     @PutMapping("makePrivate/{id}")
-    public ResponseEntity<?> makeDocumentPrivate(@PathVariable String id, 
-    @RequestHeader("Authorization") String token) {
+    public ResponseEntity<?> makeDocumentPrivate(@PathVariable String id,
+            @RequestHeader("Authorization") String token) {
         String actualToken = token.replace("Bearer ", "");
         String username = jwtService.extractUsername(actualToken);
         Optional<Documents> documentOptional = documentService.getDocumentById(id);
-        if(documentOptional.isPresent()){
+        if (documentOptional.isPresent()) {
             Documents document = documentOptional.get();
-            if(document.getOwner().getUsername().equals(username)){
+            if (document.getOwner().getUsername().equals(username)) {
                 document.setType("private");
                 documentService.updateDocument(document);
                 return ResponseEntity.status(HttpStatus.OK).body("Document is now private");
-            }else{
+            } else {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You are not the owner of the document");
             }
-        }else{
+        } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Document not found");
         }
     }

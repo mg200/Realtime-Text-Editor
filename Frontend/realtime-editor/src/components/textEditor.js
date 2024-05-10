@@ -18,7 +18,43 @@ import TextAlign from "@tiptap/extension-text-align";
 import { useQuery } from "react-query";
 import { useParams } from "react-router-dom";
 import axios from "axios";
+function getDiff(oldContent, newContent) {
+  let position = 0;
+  let beforeId = null;
+  let afterId = null;
 
+  // Find the first position where the old and new content differ
+  while (
+    position < oldContent.length &&
+    oldContent[position] === newContent[position]
+  ) {
+    position++;
+  }
+
+  // If the new content is longer, it's an insert operation
+  if (newContent.length > oldContent.length) {
+    return {
+      type: "insert",
+      position: position,
+      character: newContent[position],
+      beforeId: oldContent[position - 1]?.id,
+      afterId: oldContent[position]?.id,
+    };
+  }
+  // If the new content is shorter, it's a delete operation
+  else if (newContent.length < oldContent.length) {
+    return {
+      type: "delete",
+      position: position,
+      characterId: oldContent[position]?.id,
+      beforeId: oldContent[position - 1]?.id,
+      afterId: oldContent[position + 1]?.id,
+    };
+  }
+
+  // If the old and new content are the same length, there's no diff
+  return null;
+}
 const extensions = [
   StarterKit,
   Heading,
@@ -75,12 +111,34 @@ const TextEditor = () => {
       socket.send(jsonData);
     };
 
-    socket.onmessage = (event) => {
-      console.log("aywaaa ya habeeb akhook", event.data);
+    socket.onmessage = (event) => { // response from server
+      console.log("Received data", event.data);
       const eventData = JSON.parse(event.data);
-      const receivedContent = eventData.content;
-      setContent(receivedContent);
-      // console.log("aywaaa ya habeeb akhoo00000000000000k", content);
+      const content = eventData.content;
+      const operation = eventData.operation;
+
+      if (operation.type === "insertCharacter") {
+        const beforeIndex = content.findIndex(
+          (crdt) => crdt.id === operation.beforeId
+        );
+        const afterIndex = content.findIndex(
+          (crdt) => crdt.id === operation.afterId
+        );
+        const position = beforeIndex === -1 ? afterIndex : beforeIndex + 1;
+        const newCrdt = {
+          id: operation.characterId,
+          character: operation.character,
+          beforeId: operation.beforeId,
+          afterId: operation.afterId,
+        };
+        setContent([
+          ...content.slice(0, position),
+          newCrdt,
+          ...content.slice(position),
+        ]);
+      } else if (operation.type === "deleteCharacter") {
+        setContent(content.filter((crdt) => crdt.id !== operation.characterId));
+      }
     };
     socket.onerror = (error) => {
       console.error("WebSocket error:", error);
@@ -93,25 +151,68 @@ const TextEditor = () => {
     };
   }, [documentId]);
 
-  const sendContentToServer = (content) => {
+  // const sendContentToServer = (content) => {
+  //   if (socket) {
+  //     const data = {
+  //       documentId: documentId,
+  //       content: content,
+  //     };
+
+  //     const jsonData = JSON.stringify(data);
+  //     socket.send(jsonData);
+  //   }
+  // };
+  const sendContentToServer = (  // send operation to server
+    operationType,
+    position,
+    beforeId,
+    afterId,
+    character,
+    characterID
+  ) => {
     if (socket) {
       const data = {
         documentId: documentId,
-        content: content,
+        operation: {
+          type: operationType,
+          position: position,
+          beforeId: beforeId,
+          afterId: afterId,
+          character: character,
+          characterID: characterID,
+        },
       };
 
       const jsonData = JSON.stringify(data);
       socket.send(jsonData);
     }
   };
-
   const editor = useEditor({
     extensions: extensions,
     content: content,
     onUpdate: ({ editor }) => {
-      const content = editor.getHTML();
-      // Send the edited content to the server
-      sendContentToServer(content);
+      const newContent = editor.getHTML();
+      const diff = getDiff(content, newContent); // need to implement this function
+      if (diff.type === "insert") {
+        sendContentToServer(
+          "insertCharacter",
+          diff.position,
+          diff.beforeId,
+          diff.afterId,
+          diff.character,
+          diff.characterId
+        );
+      } else if (diff.type === "delete") {
+        sendContentToServer(
+          "deleteCharacter",
+          diff.position,
+          diff.beforeId,
+          diff.afterId,
+          diff.character,
+          diff.characterId
+        );
+      }
+      content = newContent;
     },
   });
   useEffect(() => {

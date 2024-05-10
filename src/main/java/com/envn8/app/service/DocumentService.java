@@ -1,9 +1,15 @@
 package com.envn8.app.service;
+
 import com.envn8.app.repository.DocumentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import com.envn8.app.models.CRDT;
 import com.envn8.app.models.Documents;
+
+import java.util.Comparator;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class DocumentService {
@@ -26,7 +32,8 @@ public class DocumentService {
 
     // Update
     public Documents updateDocument(Documents document) {
-        // This method now also updates the sharedWith and permissions fields of a document
+        // This method now also updates the sharedWith and permissions fields of a
+        // document
         return documentRepository.save(document);
     }
 
@@ -39,4 +46,34 @@ public class DocumentService {
     public Documents renameDocument(Documents document) {
         return documentRepository.save(document);
     }
+
+    public String getContent(String documentId) {
+        Documents document = documentRepository.findById(documentId).orElseThrow();
+        return document.getContent().stream()
+                .map(crdt -> String.valueOf(crdt.getCharacter())) // Convert each character to a string
+                .collect(Collectors.joining()); // Join all characters in the document
+    }
+
+    public void insertCharacter(String documentId, int position, String beforeId, String afterId, char character) {
+        Documents document = documentRepository.findById(documentId).orElseThrow();
+        String newId = CRDT.generateIdBetween(beforeId, afterId);
+        CRDT newElement = new CRDT(character, newId, beforeId, afterId);
+        document.getContent().add(position, newElement);
+        document.getContent().sort(Comparator.comparing(CRDT::getId));
+        documentRepository.save(document);
+    }
+
+    public void deleteCharacter(String documentId, String characterId) {
+        Optional<Documents> document = documentRepository.findById(documentId);
+        if (document.isEmpty()) {
+            System.err.println("Document not found");
+            return;
+        } else {
+            System.out.println("Document found");
+            Documents doc = document.get();
+            doc.getContent().removeIf(crdt -> crdt.getId().equals(characterId));
+            documentRepository.save(doc);
+        }
+    }
+
 }
