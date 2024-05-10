@@ -51,8 +51,19 @@ function getDiff(oldContent, newContent) {
       afterId: oldContent[position + 1]?.id,
     };
   }
+  // // If the old and new content are the same length, but different, it's a replace operation
+  // else if (newContent.length === oldContent.length && oldContent[position] !== newContent[position]) {
+  //   return {
+  //     type: "replace",
+  //     position: position,
+  //     oldCharacterId: oldContent[position]?.id,
+  //     newCharacter: newContent[position],
+  //     beforeId: oldContent[position - 1]?.id,
+  //     afterId: oldContent[position + 1]?.id,
+  //   };
+  // }
 
-  // If the old and new content are the same length, there's no diff
+  // If the old and new content are the same, there's no diff
   return null;
 }
 const extensions = [
