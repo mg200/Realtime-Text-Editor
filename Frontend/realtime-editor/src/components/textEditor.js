@@ -223,7 +223,7 @@ const TextEditor = () => {
           diff.characterId
         );
       }
-      content = newContent;
+      setContent(newContent);
     },
   });
   useEffect(() => {
