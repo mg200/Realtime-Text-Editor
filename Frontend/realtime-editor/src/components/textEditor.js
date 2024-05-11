@@ -204,6 +204,9 @@ const TextEditor = () => {
     onUpdate: ({ editor }) => {
       const newContent = editor.getHTML();
       const diff = getDiff(content, newContent); // need to implement this function
+      if (diff)
+      {
+        console.log("Diff= ", diff);
       if (diff.type === "insert") {
         sendContentToServer(
           "insertCharacter",
@@ -223,6 +226,7 @@ const TextEditor = () => {
           diff.characterId
         );
       }
+    }
       setContent(newContent);
     },
   });
