@@ -179,7 +179,7 @@ const TextEditor = () => {
     beforeId,
     afterId,
     character,
-    characterID
+    characterId
   ) => {
     if (socket) {
       const data = {
@@ -190,7 +190,7 @@ const TextEditor = () => {
           beforeId: beforeId,
           afterId: afterId,
           character: character,
-          characterID: characterID,
+          characterId: characterId,
         },
       };
 

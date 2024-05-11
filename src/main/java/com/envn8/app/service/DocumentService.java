@@ -48,8 +48,14 @@ public class DocumentService {
     }
 
     public String getContent(String documentId) {
-        Documents document = documentRepository.findById(documentId).orElseThrow();
-        return document.getContent().stream()
+
+        Optional<Documents> document = documentRepository.findById(documentId);
+        if (document.isEmpty()) {
+            System.err.println("Document not found");
+            return null;
+        }
+        Documents doc = document.get();
+        return doc.getContent().stream()
                 .map(crdt -> String.valueOf(crdt.getCharacter())) // Convert each character to a string
                 .collect(Collectors.joining()); // Join all characters in the document
     }
