@@ -132,7 +132,8 @@ const TextEditor = () => {
       socket.send(jsonData);
     };
 
-    socket.onmessage = (event) => { // response from server
+    socket.onmessage = (event) => {
+      // response from server
       console.log("Received data", event.data);
       const eventData = event.data;
       const content = eventData.content;
@@ -184,7 +185,8 @@ const TextEditor = () => {
   //     socket.send(jsonData);
   //   }
   // };
-  const sendContentToServer = (  // send operation to server
+  const sendContentToServer = (
+    // send operation to server
     operationType,
     indexStart,
     indexEnd,
@@ -216,8 +218,7 @@ const TextEditor = () => {
     onUpdate: ({ editor }) => {
       const newContent = editor.getHTML();
       const diff = getDiff(content, newContent); // need to implement this function
-      if (diff)
-      {
+      if (diff) {
         console.log("Diff= ", diff);
         if (diff.type === "insert") {
           sendContentToServer(
@@ -239,7 +240,6 @@ const TextEditor = () => {
           );
         }
       }
-    }
       setContent(newContent);
     },
   });
