@@ -69,4 +69,62 @@ public class CharacterSequence {
         return seq.toString();
     }
 
+
+    public List<CHAR> getRelativeIndex(int index) {
+        List<CHAR> result = new ArrayList<>();
+        int aliveIndex = 0;
+        boolean itemsFound = false;
+        CHAR charStart = null;
+        CHAR charEnd = null;
+
+        for (CHAR c : this.chars) {
+            if (!c.isFlagDelete()) {
+                if (aliveIndex > index) {
+                    charEnd = c;
+                    itemsFound = true;
+                } else {
+                    charStart = c;
+                }
+                aliveIndex++;
+            }
+        }
+
+        if (!itemsFound && aliveIndex >= index) {
+            charEnd = this.chars.get(this.chars.size() - 1);
+            itemsFound = true;
+        }
+        System.out.println("*************************aaaaaaaaaaaa*********************"+charStart+charEnd);
+        if (charStart != null && charEnd != null) {
+            result.add(charStart);
+            result.add(charEnd);
+            return result;
+        } else {
+            throw new IllegalArgumentException("Failed to find relative index");
+        }
+    }
+
+    public int getCharRelativeIndex(CHAR charObj) {
+        int aliveIndex = 0;
+        boolean charFound = false;
+
+        for (CHAR c : this.chars) {
+            if (!c.isFlagDelete() && !"bof".equals(c.getChar()) && !"eof".equals(c.getChar())) {
+                aliveIndex++;
+            }
+            if (c.getId().equals(charObj.getId())) {
+                if (c.isFlagDelete()) {
+                    aliveIndex++;
+                }
+                charFound = true;
+                break;
+            }
+        }
+
+        if (charFound) {
+            return aliveIndex - 1;
+        } else {
+            throw new IllegalArgumentException("Failed to find relative index");
+        }
+    }
+
 }
