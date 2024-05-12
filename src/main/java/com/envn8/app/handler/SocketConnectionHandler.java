@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import com.envn8.app.models.CHAR;
+import com.envn8.app.models.CharacterSequence;
 import com.envn8.app.service.DocumentService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Map;
@@ -23,6 +25,8 @@ public class SocketConnectionHandler extends TextWebSocketHandler {
 
     private static final List<WebSocketSession> documentRooms = new ArrayList<WebSocketSession>();
     private Map<String, List<WebSocketSession>> roomSessions = new HashMap<>();
+    private Map<String,CharacterSequence>  documentSequences  =new HashMap<>();
+    
     private DocumentService documentService;
 
     @Override
@@ -55,17 +59,19 @@ public class SocketConnectionHandler extends TextWebSocketHandler {
     @SuppressWarnings("unchecked")
     @Override
     protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
-        super.handleTextMessage(session, message);
-        ObjectMapper mapper = new ObjectMapper();
-        Map<String, Object> data = mapper.readValue(message.getPayload(), Map.class);
-
-        String documentId = (String) data.get("documentId");
-        Map<String, Object> operation = (Map<String, Object>) data.get("operation");
-
+        // super.handleTextMessage(session, message);
+        String documentId = getDocumentId(message);
+        CharacterSequence sequences = documentSequences.computeIfAbsent(documentId, k -> new CharacterSequence());
+          ObjectMapper mapper = new ObjectMapper();
+        Map<String, Object> messageMap = mapper.readValue(message.getPayload(), Map.class);
+        Map<String, Object> operation = (Map<String, Object>) messageMap.get("operation");
+        
         if (!roomSessions.containsKey(documentId)) {
             roomSessions.put(documentId, new ArrayList<>());
         }
+      
         roomSessions.get(documentId).add(session);
+<<<<<<< Updated upstream
         if (operation != null) {
             if (operation.get("type").equals("insertCharacter")) {
                 int position = (int) operation.get("position");
@@ -96,13 +102,43 @@ public class SocketConnectionHandler extends TextWebSocketHandler {
         } else {
             System.out.println("Operation is null");
         }
+=======
+        if(operation!=null){
+            String operationType= (String)operation.get("operationType");
+            System.out.print("Ana geeet hena y3mna "+operationType+" docID"+ documentId);
+        if (operationType.equals("insertCharacter")) {
+    
+            int indexStart = (int) operation.get("indexStart");
+            int indexEnd = (int) operation.get("indexEnd");
+            String charValue = (String) operation.get("charValue");
+            Object attributes = operation.get("attributes");
+            String id = (String) operation.get("id");
+
+
+            CHAR insertedChar = sequences.insert(indexStart, indexEnd, charValue, attributes, id);
+            System.out.print("Ana geeet Tany hena y3mna "+indexStart+" "+indexEnd+" "+charValue+" "+id+" "+insertedChar);
+            TextMessage updatedSequenceMessage = new TextMessage(sequences.getSequence());
+            System.out.println("final string is "+updatedSequenceMessage);
+            sendMessage(documentId, updatedSequenceMessage);
+        }else if(operationType.equals("deleteCharacter")){
+        
+            String id = (String) operation.get("id");
+            sequences.delete(id);
+            // System.out.print("Ana geeet Tany hena y3mna "+indexStart+" "+indexEnd+" "+charValue+" "+id+" ");
+            TextMessage updatedSequenceMessage = new TextMessage(sequences.getSequence());
+            System.out.println("final string is "+updatedSequenceMessage);
+            sendMessage(documentId, updatedSequenceMessage);
+        }
+        }
+
+>>>>>>> Stashed changes
     }
 
     private void sendMessage(String roomId, TextMessage message) {
+        System.out.println(" Now Server sending response " );
         if (roomSessions.containsKey(roomId)) {
-            List<WebSocketSession> sessions = new ArrayList<>(roomSessions.get(roomId)); // added array here to avoid
-                                                                                         // ConcurrentModificationException
-            System.out.println(" Now Server sending response " + sessions);
+            List<WebSocketSession> sessions = roomSessions.get(roomId);
+            System.out.println("sessionnn          "+sessions);
             for (WebSocketSession session : sessions) {
                 try {
                     if (session.isOpen()) {

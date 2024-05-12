@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import com.envn8.app.models.CHAR;
 import com.envn8.app.models.CRDT;
 import com.envn8.app.models.Documents;
 import com.envn8.app.models.User;
@@ -63,7 +64,7 @@ public class DocumentController {
         }
 
         User user = (User) userDetails;
-        List<CRDT> content = new ArrayList<>(); // as initially the document is empty
+        List<CHAR> content = new ArrayList<>(); // as initially the document is empty
 
         Documents document = Documents.builder()
                 .content(content)
@@ -279,7 +280,7 @@ public class DocumentController {
         Optional<Documents> documentOptional = documentService.getDocumentById(id);
         if (documentOptional.isPresent()) {
             Documents document = documentOptional.get();
-            List<CRDT> content = document.getContent(); // Assuming content is a property of Documents entity
+            // List<CRDT> content = document.getContent(); // Assuming content is a property of Documents entity
             return new ResponseEntity<>("aloooo ya habeby", HttpStatus.OK);
         } else {
             return new ResponseEntity<>("Document not found", HttpStatus.NOT_FOUND);

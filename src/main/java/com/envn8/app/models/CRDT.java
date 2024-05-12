@@ -49,6 +49,7 @@ public class CRDT {
     public void setAfterId(String afterId) {
         this.afterId = afterId;
     }
+<<<<<<< Updated upstream
     public static String generateIdBetween(String beforeId, String afterId) {
         if (beforeId.equals(afterId)) {
             return beforeId + '0';
@@ -72,5 +73,25 @@ public class CRDT {
                 return beforeId + '0';
             }
         }
+=======
+
+    @Override
+    public String toString() {
+        return "CRDT{" +
+                "id='" + id + '\'' +
+                ", character=" + this.character +
+                ", beforeId='" + this.beforeId + '\'' +
+                ", afterId='" + this.afterId + '\'' +
+          '}';
+    }
+
+    public static String generateIdBetween(String beforeId, String afterId) {
+        System.out.println("EH EL KALAAAAAM");
+        double befID = Double.parseDouble(beforeId);
+        double aftId = Double.parseDouble(afterId);
+        double newId = (befID+aftId)/2;
+        System.out.println("GENERATE ID VALUE IS "+newId);
+        return  Double.toString(newId);
+>>>>>>> Stashed changes
     }
 }

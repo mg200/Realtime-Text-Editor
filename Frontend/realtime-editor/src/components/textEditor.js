@@ -18,6 +18,7 @@ import TextAlign from "@tiptap/extension-text-align";
 import { useQuery } from "react-query";
 import { useParams } from "react-router-dom";
 import axios from "axios";
+
 function getDiff(oldContent, newContent) {
   let position = 0;
   let beforeId = null;
@@ -35,20 +36,36 @@ function getDiff(oldContent, newContent) {
   if (newContent.length > oldContent.length) {
     return {
       type: "insert",
+<<<<<<< Updated upstream
       position: position,
       character: newContent[position],
       beforeId: oldContent[position - 1]?.id,
       afterId: oldContent[position]?.id,
+=======
+      indexStart: position,
+      indexEnd: position + 1,
+      charValue: newContent[position],
+      attributes: {},
+      id: 5,
+>>>>>>> Stashed changes
     };
   }
   // If the new content is shorter, it's a delete operation
   else if (newContent.length < oldContent.length) {
     return {
       type: "delete",
+<<<<<<< Updated upstream
       position: position,
       characterId: oldContent[position]?.id,
       beforeId: oldContent[position - 1]?.id,
       afterId: oldContent[position + 1]?.id,
+=======
+      indexStart: position,
+      indexEnd: position + 1,
+      charValue: newContent[position],
+      attributes: {},
+      id: 5,
+>>>>>>> Stashed changes
     };
   }
   // // If the old and new content are the same length, but different, it's a replace operation
@@ -103,6 +120,13 @@ const TextEditor = () => {
   } = useQuery([documentId], () => fetchContent(documentId));
   const [socket, setSocket] = useState(null);
   const [messages, setMessages] = useState("");
+  const [idCounter, setIdCounter] = useState(0);
+
+  // Function to generate unique IDs
+  function generateUniqueId() {
+    setIdCounter((prevCounter) => prevCounter + 1);
+    return `${idCounter}`;
+  }
 
   useEffect(() => {
     if (Document) {
@@ -124,32 +148,33 @@ const TextEditor = () => {
 
     socket.onmessage = (event) => { // response from server
       console.log("Received data", event.data);
-      const eventData = JSON.parse(event.data);
+      const eventData = event.data;
       const content = eventData.content;
-      const operation = eventData.operation;
+      setContent(eventData);
+      // const operation = eventData.operation;
 
-      if (operation.type === "insertCharacter") {
-        const beforeIndex = content.findIndex(
-          (crdt) => crdt.id === operation.beforeId
-        );
-        const afterIndex = content.findIndex(
-          (crdt) => crdt.id === operation.afterId
-        );
-        const position = beforeIndex === -1 ? afterIndex : beforeIndex + 1;
-        const newCrdt = {
-          id: operation.characterId,
-          character: operation.character,
-          beforeId: operation.beforeId,
-          afterId: operation.afterId,
-        };
-        setContent([
-          ...content.slice(0, position),
-          newCrdt,
-          ...content.slice(position),
-        ]);
-      } else if (operation.type === "deleteCharacter") {
-        setContent(content.filter((crdt) => crdt.id !== operation.characterId));
-      }
+      // if (operation.type === "insertCharacter") {
+      //   const beforeIndex = content.findIndex(
+      //     (crdt) => crdt.id === operation.beforeId
+      //   );
+      //   const afterIndex = content.findIndex(
+      //     (crdt) => crdt.id === operation.afterId
+      //   );
+      //   const position = beforeIndex === -1 ? afterIndex : beforeIndex + 1;
+      //   const newCrdt = {
+      //     id: operation.characterId,
+      //     character: operation.character,
+      //     beforeId: operation.beforeId,
+      //     afterId: operation.afterId,
+      //   };
+      //   setContent([
+      //     ...content.slice(0, position),
+      //     newCrdt,
+      //     ...content.slice(position),
+      //   ]);
+      // } else if (operation.type === "deleteCharacter") {
+      //   setContent(content.filter((crdt) => crdt.id !== operation.characterId));
+      // }
     };
     socket.onerror = (error) => {
       console.error("WebSocket error:", error);
@@ -175,26 +200,27 @@ const TextEditor = () => {
   // };
   const sendContentToServer = (  // send operation to server
     operationType,
-    position,
-    beforeId,
-    afterId,
+    indexStart,
+    indexEnd,
     character,
-    characterId
+    attributes,
+    id
   ) => {
     if (socket) {
       const data = {
         documentId: documentId,
         operation: {
-          type: operationType,
-          position: position,
-          beforeId: beforeId,
-          afterId: afterId,
-          character: character,
-          characterId: characterId,
+          operationType: operationType,
+          indexStart: indexStart,
+          indexEnd: indexEnd,
+          charValue: character,
+          attributes: {},
+          id: generateUniqueId(),
         },
       };
 
       const jsonData = JSON.stringify(data);
+      console.log("dataSent", jsonData);
       socket.send(jsonData);
     }
   };
@@ -207,6 +233,7 @@ const TextEditor = () => {
       if (diff)
       {
         console.log("Diff= ", diff);
+<<<<<<< Updated upstream
       if (diff.type === "insert") {
         sendContentToServer(
           "insertCharacter",
@@ -225,6 +252,27 @@ const TextEditor = () => {
           diff.character,
           diff.characterId
         );
+=======
+        if (diff.type === "insert") {
+          sendContentToServer(
+            "insertCharacter",
+            diff.indexStart,
+            diff.indexEnd,
+            diff.charValue,
+            diff.attributes,
+            diff.id
+          );
+        } else if (diff.type === "delete") {
+          sendContentToServer(
+            "deleteCharacter",
+            diff.indexStart,
+            diff.indexEnd,
+            diff.charValue,
+            diff.attributes,
+            diff.id
+          );
+        }
+>>>>>>> Stashed changes
       }
     }
       setContent(newContent);
