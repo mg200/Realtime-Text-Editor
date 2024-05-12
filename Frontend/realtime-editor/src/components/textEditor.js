@@ -88,11 +88,14 @@ const extensions = [
 
 const fetchContent = async (documentId) => {
   const token = localStorage.getItem("token");
-  const res = await axios.get(`http://hmamdocs.me/api/dc/view/${documentId}`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
+  const res = await axios.get(
+    process.env.REACT_APP_API_URL + `/dc/view/${documentId}`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
   return res.data;
 };
 
@@ -114,11 +117,11 @@ const TextEditor = () => {
     return `${idCounter}`;
   }
 
-  useEffect(() => {
-    if (Document) {
-      setContent(Document.title);
-    }
-  }, [Document]);
+  // useEffect(() => {
+  //   if (Document) {
+  //     setContent(Document.title);
+  //   }
+  // }, [Document]);
 
   useEffect(() => {
     const socket = new WebSocket(`ws://hmamdocs.me/api/topic`);

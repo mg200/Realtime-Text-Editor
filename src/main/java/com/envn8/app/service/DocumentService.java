@@ -58,16 +58,6 @@ public class DocumentService {
     //             .collect(Collectors.joining()); // Join all characters in the document
     // }
 
-<<<<<<< Updated upstream
-    public void insertCharacter(String documentId, int position, String beforeId, String afterId, char character) {
-        Documents document = documentRepository.findById(documentId).orElseThrow();
-        String newId = CRDT.generateIdBetween(beforeId, afterId);
-        CRDT newElement = new CRDT(character, newId, beforeId, afterId);
-        document.getContent().add(position, newElement);
-        document.getContent().sort(Comparator.comparing(CRDT::getId));
-        documentRepository.save(document);
-    }
-=======
     // public void insertCharacter(String documentId, int position, String beforeId, String afterId, char character) {
     //     System.out.println("ZEMEELYYYYYYYYYyyyyyyyyyyyyyyy "+documentId+" "+position+" "+" "+beforeId+" "+afterId+" "+character);
     //     Documents document = documentRepository.findById(documentId).orElseThrow();
@@ -80,7 +70,6 @@ public class DocumentService {
     //     System.out.println("ETB3 DOCUMENT"+document.getContent());
     //     documentRepository.save(document);
     // }
->>>>>>> Stashed changes
 
     // public void deleteCharacter(String documentId, String characterId) {
     //     Optional<Documents> document = documentRepository.findById(documentId);

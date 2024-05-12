@@ -22,7 +22,7 @@ function App() {
     if (token) {
       try {
         const res = await axios.post(
-          `http://hmamdocs.me/api/dc/share/${selectedDocId}`,
+          process.env.REACT_APP_API_URL + `/dc/share/${selectedDocId}`,
           {
             permission: permission.toUpperCase(),
             username: username,
@@ -49,11 +49,14 @@ function App() {
     const token = localStorage.getItem("token");
     if (token) {
       try {
-        const res = await axios.get(`http://hmamdocs.me/api/dc/viewAll`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+        const res = await axios.get(
+          process.env.REACT_APP_API_URL + `/dc/viewAll`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
         console.log("token", token);
         console.log("Fetched owned documents:", res.data);
         // Update your state with the fetched documents here
@@ -79,11 +82,14 @@ function App() {
     const token = localStorage.getItem("token");
     if (token) {
       try {
-        const res = await axios.get(`http://hmamdocs.me/api/dc/viewShared`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+        const res = await axios.get(
+          process.env.REACT_APP_API_URL + `/dc/viewShared`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
         console.log("Fetched shared documents:", res.data);
         setSharedDocuments(
           res.data.map((doc) => ({
@@ -117,7 +123,7 @@ function App() {
 
     try {
       const res = await axios.delete(
-        `http://hmamdocs.me/api/dc/delete/${documentId}`,
+        process.env.REACT_APP_API_URL + `/dc/delete/${documentId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -138,7 +144,7 @@ function App() {
 
     try {
       const res = await axios.put(
-        `http://hmamdocs.me/api/dc/rename/${documentId}`,
+        process.env.REACT_APP_API_URL + `/dc/rename/${documentId}`,
         { title: newName },
         {
           headers: {
