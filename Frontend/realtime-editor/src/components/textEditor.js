@@ -18,11 +18,8 @@ import TextAlign from "@tiptap/extension-text-align";
 import { useQuery } from "react-query";
 import { useParams } from "react-router-dom";
 import axios from "axios";
-
 function getDiff(oldContent, newContent) {
   let position = 0;
-  let beforeId = null;
-  let afterId = null;
 
   // Find the first position where the old and new content differ
   while (
@@ -54,19 +51,7 @@ function getDiff(oldContent, newContent) {
       id: 5,
     };
   }
-  // // If the old and new content are the same length, but different, it's a replace operation
-  // else if (newContent.length === oldContent.length && oldContent[position] !== newContent[position]) {
-  //   return {
-  //     type: "replace",
-  //     position: position,
-  //     oldCharacterId: oldContent[position]?.id,
-  //     newCharacter: newContent[position],
-  //     beforeId: oldContent[position - 1]?.id,
-  //     afterId: oldContent[position + 1]?.id,
-  //   };
-  // }
 
-  // If the old and new content are the same, there's no diff
   return null;
 }
 const extensions = [
@@ -109,13 +94,6 @@ const TextEditor = () => {
   } = useQuery([documentId], () => fetchContent(documentId));
   const [socket, setSocket] = useState(null);
   const [messages, setMessages] = useState("");
-  const [idCounter, setIdCounter] = useState(0);
-
-  // Function to generate unique IDs
-  function generateUniqueId() {
-    setIdCounter((prevCounter) => prevCounter + 1);
-    return `${idCounter}`;
-  }
 
   // useEffect(() => {
   //   if (Document) {
@@ -124,7 +102,7 @@ const TextEditor = () => {
   // }, [Document]);
 
   useEffect(() => {
-    const socket = new WebSocket(`ws://hmamdocs.me/api/topic`);
+    const socket = new WebSocket(`ws://localhost:8000/api/topic`);
     // socket.onerror = function(event) {
     //   console.error("WebSocket error observed:", event);
     // };
@@ -141,30 +119,6 @@ const TextEditor = () => {
       const eventData = event.data;
       const content = eventData.content;
       setContent(eventData);
-      // const operation = eventData.operation;
-
-      // if (operation.type === "insertCharacter") {
-      //   const beforeIndex = content.findIndex(
-      //     (crdt) => crdt.id === operation.beforeId
-      //   );
-      //   const afterIndex = content.findIndex(
-      //     (crdt) => crdt.id === operation.afterId
-      //   );
-      //   const position = beforeIndex === -1 ? afterIndex : beforeIndex + 1;
-      //   const newCrdt = {
-      //     id: operation.characterId,
-      //     character: operation.character,
-      //     beforeId: operation.beforeId,
-      //     afterId: operation.afterId,
-      //   };
-      //   setContent([
-      //     ...content.slice(0, position),
-      //     newCrdt,
-      //     ...content.slice(position),
-      //   ]);
-      // } else if (operation.type === "deleteCharacter") {
-      //   setContent(content.filter((crdt) => crdt.id !== operation.characterId));
-      // }
     };
     socket.onerror = (error) => {
       console.error("WebSocket error:", error);
@@ -176,6 +130,11 @@ const TextEditor = () => {
       socket.close();
     };
   }, [documentId]);
+  const [idCounter, setIdCounter] = useState(0);
+  function generateUniqueId() {
+    setIdCounter((prevCounter) => prevCounter + 1);
+    return `${idCounter}`;
+  }
 
   // const sendContentToServer = (content) => {
   //   if (socket) {
@@ -211,7 +170,6 @@ const TextEditor = () => {
       };
 
       const jsonData = JSON.stringify(data);
-      console.log("dataSent", jsonData);
       socket.send(jsonData);
     }
   };
@@ -219,8 +177,9 @@ const TextEditor = () => {
     extensions: extensions,
     content: content,
     onUpdate: ({ editor }) => {
-      const newContent = editor.getHTML();
-      const diff = getDiff(content, newContent); // need to implement this function
+      const newContent = editor.getText();
+      console.log("contenttttttttttt", content, "Sssss", newContent);
+      const diff = getDiff(content, newContent);
       if (diff) {
         console.log("Diff= ", diff);
         if (diff.type === "insert") {

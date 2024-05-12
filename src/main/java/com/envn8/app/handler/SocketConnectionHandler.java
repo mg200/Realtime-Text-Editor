@@ -14,21 +14,32 @@ import com.envn8.app.service.DocumentService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.SendTo;
+import org.springframework.stereotype.Service;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 
-public class SocketConnectionHandler extends TextWebSocketHandler {
-
+@Service
+public class SocketConnectionHandler extends TextWebSocketHandler implements ApplicationContextAware {
     private static final List<WebSocketSession> documentRooms = new ArrayList<WebSocketSession>();
     private Map<String, List<WebSocketSession>> roomSessions = new HashMap<>();
-    private Map<String,CharacterSequence>  documentSequences  =new HashMap<>();
-    
+    private Map<String, CharacterSequence> documentSequences =new HashMap<>();
     private DocumentService documentService;
-
+    private ApplicationContext applicationContext;
+    public SocketConnectionHandler(DocumentService documentService) {
+        this.documentService = documentService;
+    }
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) {
+        this.applicationContext = applicationContext;
+        this.documentService = applicationContext.getBean(DocumentService.class);
+    }
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
         System.out.println("Connection established");
@@ -62,7 +73,7 @@ public class SocketConnectionHandler extends TextWebSocketHandler {
         // super.handleTextMessage(session, message);
         String documentId = getDocumentId(message);
         CharacterSequence sequences = documentSequences.computeIfAbsent(documentId, k -> new CharacterSequence());
-          ObjectMapper mapper = new ObjectMapper();
+        ObjectMapper mapper = new ObjectMapper();
         Map<String, Object> messageMap = mapper.readValue(message.getPayload(), Map.class);
         Map<String, Object> operation = (Map<String, Object>) messageMap.get("operation");
         
@@ -88,24 +99,15 @@ public class SocketConnectionHandler extends TextWebSocketHandler {
             TextMessage updatedSequenceMessage = new TextMessage(sequences.getSequence());
             System.out.println("final string is "+updatedSequenceMessage);
             sendMessage(documentId, updatedSequenceMessage);
-        }else if(operationType.equals("deleteCharacter")){
-        
-            String id = (String) operation.get("id");
-            sequences.delete(id);
-            // System.out.print("Ana geeet Tany hena y3mna "+indexStart+" "+indexEnd+" "+charValue+" "+id+" ");
-            TextMessage updatedSequenceMessage = new TextMessage(sequences.getSequence());
-            System.out.println("final string is "+updatedSequenceMessage);
-            sendMessage(documentId, updatedSequenceMessage);
         }
         }
-
     }
 
     private void sendMessage(String roomId, TextMessage message) {
-        System.out.println(" Now Server sending response " );
         if (roomSessions.containsKey(roomId)) {
-            List<WebSocketSession> sessions = roomSessions.get(roomId);
-            System.out.println("sessionnn          "+sessions);
+            List<WebSocketSession> sessions = roomSessions.get(roomId); // added array here to avoid
+                                                                                         // ConcurrentModificationException
+            System.out.println(" Now Server sending response " + sessions);
             for (WebSocketSession session : sessions) {
                 try {
                     if (session.isOpen()) {
