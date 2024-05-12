@@ -36,36 +36,22 @@ function getDiff(oldContent, newContent) {
   if (newContent.length > oldContent.length) {
     return {
       type: "insert",
-<<<<<<< Updated upstream
-      position: position,
-      character: newContent[position],
-      beforeId: oldContent[position - 1]?.id,
-      afterId: oldContent[position]?.id,
-=======
       indexStart: position,
       indexEnd: position + 1,
       charValue: newContent[position],
       attributes: {},
       id: 5,
->>>>>>> Stashed changes
     };
   }
   // If the new content is shorter, it's a delete operation
   else if (newContent.length < oldContent.length) {
     return {
       type: "delete",
-<<<<<<< Updated upstream
-      position: position,
-      characterId: oldContent[position]?.id,
-      beforeId: oldContent[position - 1]?.id,
-      afterId: oldContent[position + 1]?.id,
-=======
       indexStart: position,
       indexEnd: position + 1,
       charValue: newContent[position],
       attributes: {},
       id: 5,
->>>>>>> Stashed changes
     };
   }
   // // If the old and new content are the same length, but different, it's a replace operation
@@ -233,26 +219,6 @@ const TextEditor = () => {
       if (diff)
       {
         console.log("Diff= ", diff);
-<<<<<<< Updated upstream
-      if (diff.type === "insert") {
-        sendContentToServer(
-          "insertCharacter",
-          diff.position,
-          diff.beforeId,
-          diff.afterId,
-          diff.character,
-          diff.characterId
-        );
-      } else if (diff.type === "delete") {
-        sendContentToServer(
-          "deleteCharacter",
-          diff.position,
-          diff.beforeId,
-          diff.afterId,
-          diff.character,
-          diff.characterId
-        );
-=======
         if (diff.type === "insert") {
           sendContentToServer(
             "insertCharacter",
@@ -272,7 +238,6 @@ const TextEditor = () => {
             diff.id
           );
         }
->>>>>>> Stashed changes
       }
     }
       setContent(newContent);

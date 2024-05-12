@@ -71,38 +71,6 @@ public class SocketConnectionHandler extends TextWebSocketHandler {
         }
       
         roomSessions.get(documentId).add(session);
-<<<<<<< Updated upstream
-        if (operation != null) {
-            if (operation.get("type").equals("insertCharacter")) {
-                int position = (int) operation.get("position");
-                char character = (char) operation.get("character");
-                String beforeId = (String) operation.get("beforeId");
-                String afterId = (String) operation.get("afterId");
-                // Call the insertCharacter method in the DocumentService
-                documentService.insertCharacter(documentId, position, beforeId, afterId, character);
-            } else if (operation.get("type").equals("deleteCharacter")) {
-                String characterId = (String) operation.get("characterId");
-                // Call the deleteCharacter method in the DocumentService
-                documentService.deleteCharacter(documentId, characterId);
-            }
-            // other types of operations...
-
-            // Get the updated document content
-            String newContent = documentService.getContent(documentId);
-            // Create a new message with the updated content and the operation
-            Map<String, Object> newMessage = new HashMap<>();
-            newMessage.put("content", newContent);
-            newMessage.put("operation", operation);
-
-            // Convert the new message to a JSON string
-            String newMessageJson = mapper.writeValueAsString(newMessage);
-
-            // Send the new message to all sessions in the room
-            sendMessage(documentId, new TextMessage(newMessageJson));
-        } else {
-            System.out.println("Operation is null");
-        }
-=======
         if(operation!=null){
             String operationType= (String)operation.get("operationType");
             System.out.print("Ana geeet hena y3mna "+operationType+" docID"+ documentId);
@@ -131,7 +99,6 @@ public class SocketConnectionHandler extends TextWebSocketHandler {
         }
         }
 
->>>>>>> Stashed changes
     }
 
     private void sendMessage(String roomId, TextMessage message) {
