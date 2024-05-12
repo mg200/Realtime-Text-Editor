@@ -18,10 +18,42 @@ import TextAlign from "@tiptap/extension-text-align";
 import { useQuery } from "react-query";
 import { useParams } from "react-router-dom";
 import axios from "axios";
+class CharacterData {
+  // constructor()
+  // {}
+  constructor(character, id) {
+    this.character = character;
+    this.id = id;
+  }
+
+  getCharacter() {
+    return this.character;
+  }
+
+  setCharacter(character) {
+    this.character = character;
+  }
+
+  getId() {
+    return this.id;
+  }
+
+  setId(id) {
+    this.id = id;
+  }
+}
+let charactersData = [];
+let operationId = 0;
 function getDiff(oldContent, newContent) {
   let position = 0;
-
   // Find the first position where the old and new content differ
+  if(oldContent.length==0){
+    let first=new CharacterData(newContent[0],1);
+    charactersData.push(first);
+  }
+  // else {
+
+  // }
   while (
     position < oldContent.length &&
     oldContent[position] === newContent[position]
@@ -31,24 +63,26 @@ function getDiff(oldContent, newContent) {
 
   // If the new content is longer, it's an insert operation
   if (newContent.length > oldContent.length) {
+    operationId++;
     return {
       type: "insert",
       indexStart: position,
       indexEnd: position + 1,
       charValue: newContent[position],
       attributes: {},
-      id: 5,
+      id: operationId,
     };
   }
   // If the new content is shorter, it's a delete operation
   else if (newContent.length < oldContent.length) {
+    operationId++;
     return {
       type: "delete",
       indexStart: position,
       indexEnd: position + 1,
-      charValue: newContent[position],
+      charValue: oldContent[position],
       attributes: {},
-      id: 5,
+      id: operationId,
     };
   }
 
@@ -154,9 +188,10 @@ const TextEditor = () => {
     indexEnd,
     character,
     attributes,
-    id
+    id,
   ) => {
     if (socket) {
+      // const id=generateUniqueId();
       const data = {
         documentId: documentId,
         operation: {
@@ -165,7 +200,7 @@ const TextEditor = () => {
           indexEnd: indexEnd,
           charValue: character,
           attributes: {},
-          id: generateUniqueId(),
+          id: id,
         },
       };
 
@@ -189,7 +224,7 @@ const TextEditor = () => {
             diff.indexEnd,
             diff.charValue,
             diff.attributes,
-            diff.id
+            // diff.id
           );
         } else if (diff.type === "delete") {
           sendContentToServer(
@@ -198,7 +233,7 @@ const TextEditor = () => {
             diff.indexEnd,
             diff.charValue,
             diff.attributes,
-            diff.id
+            // diff.id
           );
         }
       }

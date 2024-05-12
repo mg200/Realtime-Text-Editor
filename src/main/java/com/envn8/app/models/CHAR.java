@@ -4,7 +4,7 @@ import java.util.Map;
 import java.util.UUID;
 
 public class CHAR {
-    private int index;
+    private double index;
     private String charValue;
     private boolean FlagDelete;
     private String siteID;
@@ -16,7 +16,7 @@ public class CHAR {
     public CHAR(){
         
     }
-    public CHAR(int index, String charValue, String siteID, Object attributes,String id) {
+    public CHAR(double index, String charValue, String siteID, Object attributes,String id) {
         this.index = index;
         this.charValue = charValue;
         this.siteID = siteID;
@@ -34,7 +34,7 @@ public class CHAR {
         }
         this.id =id;
     }
-    public CHAR(int index, String charValue, String siteID, Object attributes) {
+    public CHAR(double index, String charValue, String siteID, Object attributes) {
         this.index = index;
         this.charValue = charValue;
         this.siteID = siteID;
@@ -66,7 +66,7 @@ public class CHAR {
     public String getChar(){
         return this.charValue;
     }
-    public int getIndex(){
+    public double getIndex(){
         return this.index;
     }
     public boolean isFlagDelete(){

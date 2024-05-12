@@ -96,7 +96,7 @@ public class SocketConnectionHandler extends TextWebSocketHandler implements App
 
             CHAR insertedChar = sequences.insert(indexStart, indexEnd, charValue, attributes, id);
             System.out.print("Ana geeet Tany hena y3mna "+indexStart+" "+indexEnd+" "+charValue+" "+id+" "+insertedChar);
-            sequences.getRelativeIndex(insertedChar.getIndex());
+            // sequences.getRelativeIndex(insertedChar.getIndex());
             TextMessage updatedSequenceMessage = new TextMessage(sequences.getSequence());
             System.out.println("final string is "+updatedSequenceMessage);
             sendMessage(documentId, updatedSequenceMessage);
