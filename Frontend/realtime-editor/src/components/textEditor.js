@@ -47,8 +47,8 @@ let operationId = 0;
 function getDiff(oldContent, newContent) {
   let position = 0;
   // Find the first position where the old and new content differ
-  if(oldContent.length==0){
-    let first=new CharacterData(newContent[0],1);
+  if (oldContent.length == 0) {
+    let first = new CharacterData(newContent[0], 1);
     charactersData.push(first);
   }
   // else {
@@ -128,6 +128,7 @@ const TextEditor = () => {
   } = useQuery([documentId], () => fetchContent(documentId));
   const [socket, setSocket] = useState(null);
   const [messages, setMessages] = useState("");
+  const [cursor, setCursor] = useState(0);
 
   // useEffect(() => {
   //   if (Document) {
@@ -190,7 +191,7 @@ const TextEditor = () => {
     indexEnd,
     character,
     attributes,
-    id,
+    id
   ) => {
     if (socket) {
       // const id=generateUniqueId();
@@ -225,18 +226,24 @@ const TextEditor = () => {
             diff.indexStart,
             diff.indexEnd,
             diff.charValue,
-            diff.attributes,
+            diff.attributes
             // diff.id
           );
+          setCursor(diff.indexStart + 2);
         } else if (diff.type === "delete") {
           sendContentToServer(
             "deleteCharacter",
             diff.indexStart,
             diff.indexEnd,
             diff.charValue,
-            diff.attributes,
+            diff.attributes
             // diff.id
           );
+          if (diff.indexStart == 0) {
+            setCursor(1);
+          } else {
+            setCursor(diff.indexStart + 1);
+          }
         }
       }
       setContent(newContent);
@@ -247,8 +254,14 @@ const TextEditor = () => {
     if (editor) {
       console.log("Sssssssssssssss");
       editor.commands.setContent(content);
+      editor?.commands.setTextSelection(cursor);
     }
   }, [content]);
+
+  // useEffect(() => {
+  //   console.log("curser value", cursor);
+
+  // }, [cursor]);
 
   if (isLoading) {
     return <div>Loading...</div>;
