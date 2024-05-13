@@ -110,13 +110,12 @@ public class SocketConnectionHandler extends TextWebSocketHandler implements App
             int index = (int) operation.get("indexStart");
             String id = (String) operation.get("id");
             List<CHAR> relatives=sequences.getRelativeIndex(index);
-            double startIndex=relatives.get(0).getIndex();
-            sequences.delete(id);
-
-
-
-            
-
+            String id2=relatives.get(1).getId();
+            sequences.delete(id2);
+            System.out.println("Ana B3ml Delete ya 3mn "+index+"  "+id2);
+            TextMessage updatedSequenceMessage = new TextMessage(sequences.getSequence());
+            System.out.println("final string is "+updatedSequenceMessage);
+            sendMessage(documentId, updatedSequenceMessage);
         }
         }
     }
