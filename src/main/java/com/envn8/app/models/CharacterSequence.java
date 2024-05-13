@@ -25,29 +25,28 @@ public class CharacterSequence {
        }
         return false;
     }
-    public double generateIndex(int indexStart, int indexEnd) {
+    public double generateIndex(double indexStart, double indexEnd) {
 
         double diff = (indexEnd - indexStart);
         double index;
         if (diff <= 10) {
-            index = indexEnd - diff / 100;
+            index = indexStart + diff / 100;
         } else if (diff <= 1000) {
-            index = Math.round(indexEnd - diff / 10);
+            index = Math.round(indexStart + diff / 10);
         } else if (diff <= 5000) {
-            index = Math.round(indexEnd - diff / 100);
+            index = Math.round(indexStart + diff / 100);
         } else {
-            index = Math.round(indexEnd - diff / 1000);
+            index = Math.round(indexStart + diff / 1000);
         }
-        while (getStartIndex(index))
-        {
-            index-=0.01;
-        }
+        // while (getStartIndex(index))
+        // {
+        //     index-=0.01;
+        // }
         return index;
     }
-
-    public CHAR insert(int indexStart, int indexEnd, String charValue, Object attributes, String id) {
+    
+    public CHAR insert(double indexStart, double indexEnd, String charValue, Object attributes, String id) {
         double index = generateIndex(indexStart, indexEnd);
-
         System.out.println("Insert index: " + index);
         CHAR charObj = (id != null) ? new CHAR(index, charValue,  id, attributes, id) :
                 new CHAR(index, charValue, id, attributes);
@@ -83,61 +82,67 @@ public class CharacterSequence {
     }
 
 
-    // public List<CHAR> getRelativeIndex(int index) {
-    //     List<CHAR> result = new ArrayList<>();
-    //     int aliveIndex = 0;
-    //     boolean itemsFound = false;
-    //     CHAR charStart = null;
-    //     CHAR charEnd = null;
+    public List<CHAR> getRelativeIndex(int index) {
+        List<CHAR> result = new ArrayList<>();
+        int aliveIndex = 0;
+        boolean itemsFound = false;
+        CHAR charStart = null;
+        CHAR charEnd = null;
+        System.out.println("ALOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO"+index);
 
-    //     for (CHAR c : this.chars) {
-    //         if (!c.isFlagDelete()) {
-    //             if (aliveIndex > index) {
-    //                 charEnd = c;
-    //                 itemsFound = true;
-    //             } else {
-    //                 charStart = c;
-    //             }
-    //             aliveIndex++;
-    //         }
-    //     }
+        for (CHAR c : this.chars) {
+            if (!c.isFlagDelete()) {
+                System.out.println("zh2ttttttttttttttttt"+aliveIndex);
+                if (aliveIndex > (int)index) {
+                    charEnd = c;
+                    itemsFound = true;
+                    System.out.println("mashy "+c.getChar());
+                    break;
+                } else {
+                    charStart = c;
+                }
+                aliveIndex++;
+            }
+        }
+      
 
-    //     if (!itemsFound && aliveIndex >= index) {
-    //         charEnd = this.chars.get(this.chars.size() - 1);
-    //         itemsFound = true;
-    //     }
-    //     System.out.println("*************************aaaaaaaaaaaa*********************"+charStart+charEnd);
-    //     if (charStart != null && charEnd != null) {
-    //         result.add(charStart);
-    //         result.add(charEnd);
-    //         return result;
-    //     } else {
-    //         throw new IllegalArgumentException("Failed to find relative index");
-    //     }
-    // }
+        if (!itemsFound && aliveIndex >= index) {
+            charEnd = this.chars.get(this.chars.size() - 1);
+            itemsFound = true;
+        }
+       
+        if (charStart != null && charEnd != null) {
+            System.out.println("start Character"+charStart.getChar());
+            result.add(charStart);
+            result.add(charEnd);
+            return result;
+        } else {
+            throw new IllegalArgumentException("Failed to find relative index");
+        }
+    }
 
-    // public int getCharRelativeIndex(CHAR charObj) {
-    //     int aliveIndex = 0;
-    //     boolean charFound = false;
+    public int getCharRelativeIndex(CHAR charObj) {
+        int aliveIndex = 0;
+        boolean charFound = false;
 
-    //     for (CHAR c : this.chars) {
-    //         if (!c.isFlagDelete() && !"bof".equals(c.getChar()) && !"eof".equals(c.getChar())) {
-    //             aliveIndex++;
-    //         }
-    //         if (c.getId().equals(charObj.getId())) {
-    //             if (c.isFlagDelete()) {
-    //                 aliveIndex++;
-    //             }
-    //             charFound = true;
-    //             break;
-    //         }
-    //     }
+        for (CHAR c : this.chars) {
+            if (!c.isFlagDelete() && !"bof".equals(c.getChar()) && !"eof".equals(c.getChar())) {
+                aliveIndex++;
+            }
+            if (c.getId().equals(charObj.getId())) {
+                if (c.isFlagDelete()) {
+                    aliveIndex++;
+                }
+                charFound = true;
+                break;
+            }
+        }
 
-    //     if (charFound) {
-    //         return aliveIndex - 1;
-    //     } else {
-    //         throw new IllegalArgumentException("Failed to find relative index");
-    //     }
-    // }
+        if (charFound) {
+            return aliveIndex - 1;
+        } else {
+            throw new IllegalArgumentException("Failed to find relative index");
+        }
+    }
 
 }

@@ -78,6 +78,8 @@ public class CHAR {
     public void setFlagDelete(boolean val){
         this.FlagDelete=val;
     }
-
+    public void setIndex(double index){
+        this.index=index;
+    }
     
 }

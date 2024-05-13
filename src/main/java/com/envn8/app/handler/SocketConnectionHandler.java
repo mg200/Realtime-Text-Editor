@@ -87,26 +87,43 @@ public class SocketConnectionHandler extends TextWebSocketHandler implements App
             System.out.print("Ana geeet hena y3mna "+operationType+" docID"+ documentId);
         if (operationType.equals("insertCharacter")) {
     
-            int indexStart = (int) operation.get("indexStart");
-            int indexEnd = (int) operation.get("indexEnd");
+            String id = (String) operation.get("id");
+            int index = (int) operation.get("indexStart");
             String charValue = (String) operation.get("charValue");
             Object attributes = operation.get("attributes");
-            String id = (String) operation.get("id");
 
-
-            CHAR insertedChar = sequences.insert(indexStart, indexEnd, charValue, attributes, id);
-            System.out.print("Ana geeet Tany hena y3mna "+indexStart+" "+indexEnd+" "+charValue+" "+id+" "+insertedChar);
-            // sequences.getRelativeIndex(insertedChar.getIndex());
+            List<CHAR> relatives=sequences.getRelativeIndex(index);
+            double startIndex=relatives.get(0).getIndex();
+            double endIndex=relatives.get(1).getIndex();
+            System.out.println("END ELEMENT"+relatives.get(1).getChar());
+            if(startIndex==-1 &&endIndex==-1){
+                startIndex=0;
+                endIndex=0;
+            }
+            CHAR insertedChar = sequences.insert(startIndex, endIndex, charValue, attributes, id);
+            System.out.println("Ana geeet Tany hena y3mna "+index+"  "+startIndex+" "+endIndex+" "+charValue+" "+id+" "+insertedChar);
+            String content = "content"+sequences.getSequence() + "index" + insertedChar.getIndex();
             TextMessage updatedSequenceMessage = new TextMessage(sequences.getSequence());
             System.out.println("final string is "+updatedSequenceMessage);
             sendMessage(documentId, updatedSequenceMessage);
+        }else if(operationType.equals("deleteCharacter")){
+            int index = (int) operation.get("indexStart");
+            String id = (String) operation.get("id");
+            List<CHAR> relatives=sequences.getRelativeIndex(index);
+            double startIndex=relatives.get(0).getIndex();
+            sequences.delete(id);
+
+
+
+            
+
         }
         }
     }
 
     private void sendMessage(String roomId, TextMessage message) {
         if (roomSessions.containsKey(roomId)) {
-            List<WebSocketSession> sessions = roomSessions.get(roomId); // added array here to avoid
+            List<WebSocketSession> sessions = roomSessions.get(roomId); 
                                                                                          // ConcurrentModificationException
             System.out.println(" Now Server sending response " + sessions);
             for (WebSocketSession session : sessions) {

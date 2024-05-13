@@ -169,6 +169,8 @@ const TextEditor = () => {
     setIdCounter((prevCounter) => prevCounter + 1);
     return `${idCounter}`;
   }
+  const [OldContent, setOldContent] = useState([]);
+  const [NewContent, setNewContent] = useState([]);
 
   // const sendContentToServer = (content) => {
   //   if (socket) {
