@@ -75,6 +75,12 @@ public class CHAR {
     public String getSiteID(){
         return this.siteID;
     }
+    public boolean getIsItalic(){
+        return this.italic;
+    }
+    public boolean getBold(){
+        return this.bold;
+    }
     public void setFlagDelete(boolean val){
         this.FlagDelete=val;
     }

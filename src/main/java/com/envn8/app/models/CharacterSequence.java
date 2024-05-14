@@ -10,6 +10,10 @@ public class CharacterSequence {
     private String siteID;
     private int count;
 
+    public List<CHAR> getContent(){
+        return this.chars;
+    }
+
     public CharacterSequence() {
         this.chars = new ArrayList<>();
         this.chars.add(new CHAR(0, "bof", this.siteID, new Object()));

@@ -30,6 +30,7 @@ public class SocketConnectionHandler extends TextWebSocketHandler implements App
     private static final List<WebSocketSession> documentRooms = new ArrayList<WebSocketSession>();
     private Map<String, List<WebSocketSession>> roomSessions = new HashMap<>();
     private Map<String, CharacterSequence> documentSequences =new HashMap<>();
+    private final ObjectMapper objectMapper = new ObjectMapper();
     private DocumentService documentService;
     private ApplicationContext applicationContext;
     public SocketConnectionHandler(DocumentService documentService) {
@@ -103,7 +104,8 @@ public class SocketConnectionHandler extends TextWebSocketHandler implements App
             CHAR insertedChar = sequences.insert(startIndex, endIndex, charValue, attributes, id);
             System.out.println("Ana geeet Tany hena y3mna "+index+"  "+startIndex+" "+endIndex+" "+charValue+" "+id+" "+insertedChar);
             String content = "content"+sequences.getSequence() + "index" + insertedChar.getIndex();
-            TextMessage updatedSequenceMessage = new TextMessage(sequences.getSequence());
+            String messageContent = objectMapper.writeValueAsString(sequences.getContent());
+            TextMessage updatedSequenceMessage = new TextMessage(messageContent);
             System.out.println("final string is "+updatedSequenceMessage);
             sendMessage(documentId, updatedSequenceMessage);
         }else if(operationType.equals("deleteCharacter")){
@@ -113,10 +115,15 @@ public class SocketConnectionHandler extends TextWebSocketHandler implements App
             String id2=relatives.get(1).getId();
             sequences.delete(id2);
             System.out.println("Ana B3ml Delete ya 3mn "+index+"  "+id2);
-            TextMessage updatedSequenceMessage = new TextMessage(sequences.getSequence());
+            String messageContent = objectMapper.writeValueAsString(sequences.getContent());
+            TextMessage updatedSequenceMessage = new TextMessage(messageContent);
             System.out.println("final string is "+updatedSequenceMessage);
             sendMessage(documentId, updatedSequenceMessage);
         }
+        }else{
+            String messageContent = objectMapper.writeValueAsString(sequences.getContent());
+            TextMessage updatedSequenceMessage = new TextMessage(messageContent);
+            sendMessage(documentId, updatedSequenceMessage);
         }
     }
 

@@ -19,11 +19,10 @@ import { useQuery } from "react-query";
 import { useParams } from "react-router-dom";
 import axios from "axios";
 class CharacterData {
-  // constructor()
-  // {}
-  constructor(character, id) {
+  constructor(character, id, bold = false) {
     this.character = character;
     this.id = id;
+    this.bold = bold;
   }
 
   getCharacter() {
@@ -41,19 +40,27 @@ class CharacterData {
   setId(id) {
     this.id = id;
   }
+
+  isBold() {
+    return this.bold;
+  }
+
+  setBold(bold) {
+    this.bold = bold;
+  }
 }
+
 let charactersData = [];
 let operationId = 0;
 function getDiff(oldContent, newContent) {
   let position = 0;
   // Find the first position where the old and new content differ
+  console.log("old content", oldContent);
+  console.log("new content", newContent);
   if (oldContent.length == 0) {
     let first = new CharacterData(newContent[0], 1);
     charactersData.push(first);
   }
-  // else {
-
-  // }
   while (
     position < oldContent.length &&
     oldContent[position] === newContent[position]
@@ -61,7 +68,6 @@ function getDiff(oldContent, newContent) {
     position++;
   }
 
-  // If the new content is longer, it's an insert operation
   if (newContent.length > oldContent.length) {
     operationId++;
     return {
@@ -120,7 +126,7 @@ const fetchContent = async (documentId) => {
 
 const TextEditor = () => {
   const { documentId } = useParams();
-  const [content, setContent] = useState("");
+  const [content, setContent] = useState();
   const {
     data: Document,
     isLoading,
@@ -129,18 +135,32 @@ const TextEditor = () => {
   const [socket, setSocket] = useState(null);
   const [messages, setMessages] = useState("");
   const [cursor, setCursor] = useState(0);
+  const [data, setData] = useState([]);
+  const [DataTobeSaved, setDataToBeSaved] = useState();
 
-  useEffect(() => {
-    if (Document) {
-      setContent(Document.content);
+  const saveContent = async (data) => {
+    try {
+      const token = localStorage.getItem("token");
+      console.log("data to be saved", data);
+      const res = await axios.post(
+        process.env.REACT_APP_API_URL + `/dc/save/${documentId}`,
+        {
+          content: data,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      console.log("Document Saved", res.data);
+    } catch (error) {
+      console.error("Error:", error);
     }
-  }, [Document]);
+  };
 
   useEffect(() => {
     const socket = new WebSocket(`ws://localhost:8000/api/topic`);
-    // socket.onerror = function(event) {
-    //   console.error("WebSocket error observed:", event);
-    // };
     socket.onopen = () => {
       console.log("WebSocket connected");
       const data = { documentId: documentId, content: "" };
@@ -152,8 +172,9 @@ const TextEditor = () => {
       // response from server
       console.log("Received data", event.data);
       const eventData = event.data;
-      const content = eventData.content;
-      setContent(eventData);
+      setDataToBeSaved(JSON.parse(eventData));
+      setData(JSON.parse(eventData));
+      // saveContent(eventData);
     };
     socket.onerror = (error) => {
       console.error("WebSocket error:", error);
@@ -170,22 +191,44 @@ const TextEditor = () => {
     setIdCounter((prevCounter) => prevCounter + 1);
     return `${idCounter}`;
   }
-  const [OldContent, setOldContent] = useState([]);
-  const [NewContent, setNewContent] = useState([]);
+  const [oldContent, setOldContent] = useState("");
+  const [NewContent, setNewContent] = useState("");
 
-  // const sendContentToServer = (content) => {
-  //   if (socket) {
-  //     const data = {
-  //       documentId: documentId,
-  //       content: content,
-  //     };
+  const extractContent = (data) => {
+    let content = "";
+    let contentBegin = "";
 
-  //     const jsonData = JSON.stringify(data);
-  //     socket.send(jsonData);
-  //   }
-  // };
+    console.log("Data received:", data);
+    if (Array.isArray(data)) {
+      data.slice(1, -1).forEach((item) => {
+        if (item.isItalic && item.bold && !item.flagDelete) {
+          content += `<b><i>${item.char}</i></b>`;
+        } else if (item.bold && !item.flagDelete) {
+          content += `<b>${item.char}</b>`;
+        } else if (item.isItalic && !item.flagDelete) {
+          content += `<i>${item.char}</i>`;
+        } else if (!item.flagDelete) {
+          content += item.char;
+        }
+        if (!item.flagDelete) {
+          contentBegin += item.char;
+        }
+      });
+    } else {
+      console.error("Expected an array, but received:", typeof data);
+    }
+    setOldContent(contentBegin);
+    return content;
+  };
+
+  // const interval = setInterval(async () => {
+
+  // }, 10000);
+
+  // useEffect(() => {
+  //   setContent();
+  // }, []);
   const sendContentToServer = (
-    // send operation to server
     operationType,
     indexStart,
     indexEnd,
@@ -194,7 +237,8 @@ const TextEditor = () => {
     id
   ) => {
     if (socket) {
-      // const id = generateUniqueId();
+      const isBold = editor.isActive("bold");
+      const isItalic = editor.isActive("italic");
       const data = {
         documentId: documentId,
         operation: {
@@ -202,7 +246,7 @@ const TextEditor = () => {
           indexStart: indexStart,
           indexEnd: indexEnd,
           charValue: character,
-          attributes: {},
+          attributes: { bold: isBold, italic: isItalic },
           id: id,
         },
       };
@@ -211,13 +255,42 @@ const TextEditor = () => {
       socket.send(jsonData);
     }
   };
+
+  useEffect(() => {
+    console.log("Sssssssssssssssssss");
+    if (editor) {
+      console.log("Sssssssssssssss");
+      // editor.commands.setContent(extractContent(data));
+      editor?.commands.setTextSelection(cursor);
+    }
+  }, [data]);
+  useEffect(() => {
+    if (Document) {
+      // setContent(JSON.parse(JSON.parse(JSON.parse(Document.content)).content));
+      extractContent(
+        JSON.parse(JSON.parse(JSON.parse(Document.content)).content)
+      );
+      console.log(
+        "ALOOO HENA CONTENT ",
+        JSON.parse(JSON.parse(JSON.parse(Document.content)).content)
+      );
+
+      console.log("content before ", content);
+
+      console.log("content after ", content);
+    }
+  }, [Document]);
   const editor = useEditor({
     extensions: extensions,
     content: content,
     onUpdate: ({ editor }) => {
       const newContent = editor.getText();
       console.log("contenttttttttttt", content, "Sssss", newContent);
-      const diff = getDiff(content, newContent);
+      const diff = getDiff(oldContent, newContent);
+      const { from, to } = editor.state.selection;
+      setCursor(from);
+      console.log("cursor position is ", from, " ", to);
+      setOldContent(newContent);
       if (diff) {
         console.log("Diff= ", diff);
         if (diff.type === "insert") {
@@ -229,7 +302,6 @@ const TextEditor = () => {
             diff.attributes
             // diff.id
           );
-          setCursor(diff.indexStart + 2);
         } else if (diff.type === "delete") {
           sendContentToServer(
             "deleteCharacter",
@@ -239,24 +311,11 @@ const TextEditor = () => {
             diff.attributes
             // diff.id
           );
-          if (diff.indexStart == 0) {
-            setCursor(1);
-          } else {
-            setCursor(diff.indexStart + 1);
-          }
         }
       }
       setContent(newContent);
     },
   });
-  useEffect(() => {
-    console.log("Sssssssssssssssssss");
-    if (editor) {
-      console.log("Sssssssssssssss");
-      editor.commands.setContent(content);
-      editor?.commands.setTextSelection(cursor);
-    }
-  }, [content]);
 
   if (isLoading) {
     return <div>Loading...</div>;
