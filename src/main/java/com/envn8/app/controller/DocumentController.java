@@ -88,8 +88,13 @@ public class DocumentController {
     @GetMapping("/view/{id}")
     public ResponseEntity<Documents> viewDocument(@PathVariable String id,
             @RequestHeader("Authorization") String token) {
-        // System.out.println("hello it's me " + token);
         String actualToken = token.replace("Bearer ", "");
+        if(actualToken == null || actualToken.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+        if(id == null || id.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
         String username = jwtService.extractUsername(actualToken);
         Optional<Documents> documentOptional = documentService.getDocumentById(id);
         if (documentOptional.isPresent()) {
@@ -287,6 +292,18 @@ public class DocumentController {
         }
     }
 
+    @GetMapping("/dc/view2/{id}")
+    public ResponseEntity<?> getDocumentContent2(@PathVariable String id) {
+        Optional<Documents> documentOptional = documentService.getDocumentById(id);
+        if (documentOptional.isPresent()) {
+            Documents document = documentOptional.get();
+            // List<CRDT> content = document.getContent(); // Assuming content is a property of Documents entity
+            return new ResponseEntity<>("aloooo ya habeby", HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>("Document not found", HttpStatus.NOT_FOUND);
+        }
+    }
+
     // only owner can make document public or private
     @PutMapping("makePublic/{id}")
     public ResponseEntity<?> makeDocumentPublic(@PathVariable String id,
@@ -327,22 +344,5 @@ public class DocumentController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Document not found");
         }
     }
-    // @Autowired
-    // private SimpMessagingTemplate messagingTemplate;
-
-    // public void broadcastDocumentUpdate(String documentId, String updateMessage)
-    // {
-    // messagingTemplate.convertAndSend("/topic/document/" + documentId,
-    // updateMessage);
-    // }
-
-    // @MessageMapping("/document/{documentId}")
-    // @SendTo("/topic/document/{documentId}/content")
-    // public String editDocument(@DestinationVariable String documentId, String
-    // content) {
-    // System.out.println("aywaa ya sahbyyy");
-
-    // return content;
-    // }
 
 }
