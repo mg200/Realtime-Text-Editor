@@ -130,11 +130,11 @@ const TextEditor = () => {
   const [messages, setMessages] = useState("");
   const [cursor, setCursor] = useState(0);
 
-  // useEffect(() => {
-  //   if (Document) {
-  //     setContent(Document.title);
-  //   }
-  // }, [Document]);
+  useEffect(() => {
+    if (Document) {
+      setContent(Document.content);
+    }
+  }, [Document]);
 
   useEffect(() => {
     const socket = new WebSocket(`ws://localhost:8000/api/topic`);
@@ -194,7 +194,7 @@ const TextEditor = () => {
     id
   ) => {
     if (socket) {
-      // const id=generateUniqueId();
+      // const id = generateUniqueId();
       const data = {
         documentId: documentId,
         operation: {
@@ -257,11 +257,6 @@ const TextEditor = () => {
       editor?.commands.setTextSelection(cursor);
     }
   }, [content]);
-
-  // useEffect(() => {
-  //   console.log("curser value", cursor);
-
-  // }, [cursor]);
 
   if (isLoading) {
     return <div>Loading...</div>;
