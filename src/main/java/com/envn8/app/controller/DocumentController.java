@@ -67,7 +67,7 @@ public class DocumentController {
         }
 
         User user = (User) userDetails;
-        String content = ""; // as initially the document is empty
+        List<CHAR> content = new ArrayList<>(); // as initially the document is empty
 
         Documents document = Documents.builder()
                 .content(content)
@@ -427,24 +427,24 @@ public class DocumentController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Document not found");
         }
     }
-    @PostMapping("/save/{id}")
-    public ResponseEntity<?> saveDocumentContent(@PathVariable String id, @RequestBody String content,
-            @RequestHeader("Authorization") String token) throws JsonProcessingException {
-        Optional<Documents> documentOptional = documentService.getDocumentById(id);
-        System.out.println("Alooooooooooooooooooooooo content eh "+content);
-        if (documentOptional.isPresent()) {
-            Documents document = documentOptional.get();
+    // @PostMapping("/save/{id}")
+    // public ResponseEntity<?> saveDocumentContent(@PathVariable String id, @RequestBody String content,
+    //         @RequestHeader("Authorization") String token) throws JsonProcessingException {
+    //     Optional<Documents> documentOptional = documentService.getDocumentById(id);
+    //     System.out.println("Alooooooooooooooooooooooo content eh "+content);
+    //     if (documentOptional.isPresent()) {
+    //         Documents document = documentOptional.get();
 
-            // Convert content to JSON string
-            ObjectMapper mapper = new ObjectMapper();
-            String contentJson = mapper.writeValueAsString(content);
+    //         // Convert content to JSON string
+    //         ObjectMapper mapper = new ObjectMapper();
+    //         String contentJson = mapper.writeValueAsString(content);
 
-            document.setContent(contentJson);
-            documentService.updateDocument(document);
-            return new ResponseEntity<>("Document saved successfully", HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>("Document not found", HttpStatus.NOT_FOUND);
-    }   
-    }
+    //         document.setContent(contentJson);
+    //         documentService.updateDocument(document);
+    //         return new ResponseEntity<>("Document saved successfully", HttpStatus.OK);
+    //     } else {
+    //         return new ResponseEntity<>("Document not found", HttpStatus.NOT_FOUND);
+    // }   
+    // }
 
 }

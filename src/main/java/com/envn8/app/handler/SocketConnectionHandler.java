@@ -24,7 +24,6 @@ import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
-
 @Service
 public class SocketConnectionHandler extends TextWebSocketHandler implements ApplicationContextAware {
     private static final List<WebSocketSession> documentRooms = new ArrayList<WebSocketSession>();
@@ -46,7 +45,7 @@ public class SocketConnectionHandler extends TextWebSocketHandler implements App
         System.out.println("Connection established");
         super.afterConnectionEstablished(session);
         documentRooms.add(session);
-
+        
     }
 
     @Override
@@ -73,7 +72,18 @@ public class SocketConnectionHandler extends TextWebSocketHandler implements App
     protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
         // super.handleTextMessage(session, message);
         String documentId = getDocumentId(message);
-        CharacterSequence sequences = documentSequences.computeIfAbsent(documentId, k -> new CharacterSequence());
+        CharacterSequence sequences ;
+        if( documentSequences.get(documentId)==null){
+            List<CHAR> Oldcontent = documentService.getContent(documentId);
+             sequences = documentSequences.computeIfAbsent(documentId, k -> new CharacterSequence(Oldcontent));
+
+        }
+        System.out.println("Service ll"+documentSequences.get(documentId));
+        sequences=documentSequences.get(documentId);
+       
+        // CharacterSequence sequences = new CharacterSequence(content);
+        
+        documentSequences.put(documentId, sequences);
         ObjectMapper mapper = new ObjectMapper();
         Map<String, Object> messageMap = mapper.readValue(message.getPayload(), Map.class);
         Map<String, Object> operation = (Map<String, Object>) messageMap.get("operation");
@@ -108,6 +118,8 @@ public class SocketConnectionHandler extends TextWebSocketHandler implements App
             TextMessage updatedSequenceMessage = new TextMessage(messageContent);
             System.out.println("final string is "+updatedSequenceMessage);
             sendMessage(documentId, updatedSequenceMessage);
+          
+
         }else if(operationType.equals("deleteCharacter")){
             int index = (int) operation.get("indexStart");
             String id = (String) operation.get("id");
@@ -119,12 +131,14 @@ public class SocketConnectionHandler extends TextWebSocketHandler implements App
             TextMessage updatedSequenceMessage = new TextMessage(messageContent);
             System.out.println("final string is "+updatedSequenceMessage);
             sendMessage(documentId, updatedSequenceMessage);
+            saveDocument(documentId, sequences.getContent());
         }
         }else{
             String messageContent = objectMapper.writeValueAsString(sequences.getContent());
             TextMessage updatedSequenceMessage = new TextMessage(messageContent);
             sendMessage(documentId, updatedSequenceMessage);
         }
+
     }
 
     private void sendMessage(String roomId, TextMessage message) {
@@ -152,5 +166,13 @@ public class SocketConnectionHandler extends TextWebSocketHandler implements App
         System.out.println("Document ID: " + map.get("documentId"));
         return map.get("documentId");
     }
+
+    private void saveDocument(String documentId, List<CHAR> content) {
+        documentService.getDocumentById(documentId).ifPresent(document -> {
+            document.setContent(content);
+            documentService.updateDocument(document);
+        });
+        // documentService.updateDocument(documentId, content);
+}
 
 }

@@ -137,6 +137,56 @@ const TextEditor = () => {
   const [cursor, setCursor] = useState(0);
   const [data, setData] = useState([]);
   const [DataTobeSaved, setDataToBeSaved] = useState();
+  const [oldContent, setOldContent] = useState("");
+  const [NewContent, setNewContent] = useState("");
+  const [DocumentContent, setDocumentContent] = useState("");
+  const extractContent = (data) => {
+    let con = "";
+    let contentBegin = "";
+
+    console.log("Data received henaa:", data);
+    if (Array.isArray(data)) {
+      data.slice(1, -1).forEach((item) => {
+        if (
+          item.char != "bof" &&
+          item.char != "eof" &&
+          item.isItalic &&
+          item.bold &&
+          !item.flagDelete
+        ) {
+          con += `<b><i>${item.char}</i></b>`;
+        } else if (
+          item.char != "bof" &&
+          item.char != "eof" &&
+          item.bold &&
+          !item.flagDelete
+        ) {
+          con += `<b>${item.char}</b>`;
+        } else if (
+          item.char != "bof" &&
+          item.char != "eof" &&
+          item.isItalic &&
+          !item.flagDelete
+        ) {
+          con += `<i>${item.char}</i>`;
+        } else if (
+          item.char != "bof" &&
+          item.char != "eof" &&
+          !item.flagDelete
+        ) {
+          con += item.char;
+        }
+        if (item.char != "bof" && item.char != "eof" && !item.flagDelete) {
+          contentBegin += item.char;
+        }
+      });
+    } else {
+      console.error("Expected an array, but received:", typeof data);
+    }
+    setOldContent(contentBegin);
+    console.log("Content baaaaaaaaaaa", con);
+    return con;
+  };
 
   const saveContent = async (data) => {
     try {
@@ -172,9 +222,11 @@ const TextEditor = () => {
       // response from server
       console.log("Received data", event.data);
       const eventData = event.data;
-      setDataToBeSaved(JSON.parse(eventData));
-      setData(JSON.parse(eventData));
-      // saveContent(eventData);
+      setDataToBeSaved(eventData);
+      // editor.commands.setContent(extractContent(JSON.parse(eventData)));
+      setData(eventData);
+      // let temp = extractContent(JSON.parse(eventData));
+      // setDocumentContent(temp);
     };
     socket.onerror = (error) => {
       console.error("WebSocket error:", error);
@@ -191,35 +243,6 @@ const TextEditor = () => {
     setIdCounter((prevCounter) => prevCounter + 1);
     return `${idCounter}`;
   }
-  const [oldContent, setOldContent] = useState("");
-  const [NewContent, setNewContent] = useState("");
-
-  const extractContent = (data) => {
-    let content = "";
-    let contentBegin = "";
-
-    console.log("Data received:", data);
-    if (Array.isArray(data)) {
-      data.slice(1, -1).forEach((item) => {
-        if (item.isItalic && item.bold && !item.flagDelete) {
-          content += `<b><i>${item.char}</i></b>`;
-        } else if (item.bold && !item.flagDelete) {
-          content += `<b>${item.char}</b>`;
-        } else if (item.isItalic && !item.flagDelete) {
-          content += `<i>${item.char}</i>`;
-        } else if (!item.flagDelete) {
-          content += item.char;
-        }
-        if (!item.flagDelete) {
-          contentBegin += item.char;
-        }
-      });
-    } else {
-      console.error("Expected an array, but received:", typeof data);
-    }
-    setOldContent(contentBegin);
-    return content;
-  };
 
   // const interval = setInterval(async () => {
 
@@ -259,30 +282,47 @@ const TextEditor = () => {
   useEffect(() => {
     console.log("Sssssssssssssssssss");
     if (editor) {
-      console.log("Sssssssssssssss");
-      // editor.commands.setContent(extractContent(data));
+      console.log("Sssssssssssssss", data);
+      editor.commands.setContent(extractContent(JSON.parse(data)));
       editor?.commands.setTextSelection(cursor);
     }
   }, [data]);
-  useEffect(() => {
-    if (Document) {
-      // setContent(JSON.parse(JSON.parse(JSON.parse(Document.content)).content));
-      extractContent(
-        JSON.parse(JSON.parse(JSON.parse(Document.content)).content)
-      );
-      console.log(
-        "ALOOO HENA CONTENT ",
-        JSON.parse(JSON.parse(JSON.parse(Document.content)).content)
-      );
+  // useEffect(() => {
+  //   if (Document) {
+  //     try {
+  //       // if (
+  //       //   JSON.parse(JSON.parse(Document.content))?.content?.length &&
+  //       //   JSON.parse(JSON.parse(Document.content)).content.length > 0
+  //       // ) {
+  //       //   console.log(
+  //       //     "ALOOO HENA CONTENT ",
+  //       //     JSON.parse(JSON.parse(Document.content))
+  //       //   );
+  //       // editor.commands.setContent(
+  //       //   extractContent(JSON.parse(JSON.parse(Document.content)).content)
+  //       // );
+  //       // }
+  //     } catch (e) {
+  //       console.log("empty data");
+  //     }
+  //   }
+  // }, []);
+  // useEffect(() => {
+  //   const intervalId = setInterval(() => {
+  //     console.log(
+  //       "aywa hena save",
+  //       JSON.stringify(DataTobeSaved),
+  //       oldContent,
+  //       NewContent
+  //     );
+  //     saveContent(JSON.stringify(DataTobeSaved));
+  //   }, 10000);
 
-      console.log("content before ", content);
-
-      console.log("content after ", content);
-    }
-  }, [Document]);
+  //   return () => clearInterval(intervalId);
+  // }, [DataTobeSaved]);
   const editor = useEditor({
     extensions: extensions,
-    content: content,
+    content: DocumentContent,
     onUpdate: ({ editor }) => {
       const newContent = editor.getText();
       console.log("contenttttttttttt", content, "Sssss", newContent);
@@ -313,7 +353,7 @@ const TextEditor = () => {
           );
         }
       }
-      setContent(newContent);
+      // setContent(newContent);
     },
   });
 
