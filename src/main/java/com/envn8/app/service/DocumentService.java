@@ -4,10 +4,12 @@ import com.envn8.app.repository.DocumentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.envn8.app.models.CHAR;
 import com.envn8.app.models.CRDT;
 import com.envn8.app.models.Documents;
 
 import java.util.Comparator;
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -44,6 +46,14 @@ public class DocumentService {
     public Documents renameDocument(Documents document) {
         return documentRepository.save(document);
     }
+    public List<CHAR> getContent(String documentId) {
+        Optional<Documents> document = documentRepository.findById(documentId);
+        if (document.isPresent()) {
+            return document.get().getContent();
+        } else {
+            return null; 
+}
+}
 
     // public String getContent(String documentId) {
 

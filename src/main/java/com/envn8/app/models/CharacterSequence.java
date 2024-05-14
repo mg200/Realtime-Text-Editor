@@ -10,10 +10,6 @@ public class CharacterSequence {
     private String siteID;
     private int count;
 
-    public List<CHAR> getContent(){
-        return this.chars;
-    }
-
     public CharacterSequence() {
         this.chars = new ArrayList<>();
         this.chars.add(new CHAR(0, "bof", this.siteID, new Object()));
@@ -21,14 +17,28 @@ public class CharacterSequence {
         this.siteID = UUID.randomUUID().toString();
         this.count = 100;
     }
+
+    public CharacterSequence(List<CHAR> content) {
+        this.chars = content;
+        this.chars.add(new CHAR(0, "bof", this.siteID, new Object()));
+        this.chars.add(new CHAR(10000, "eof", this.siteID, new Object()));
+        this.siteID = UUID.randomUUID().toString();
+        this.count = 100;
+    }
+
+    public List<CHAR> getContent() {
+        return this.chars;
+    }
+
     public boolean getStartIndex(double index) {
-       for(CHAR c : this.chars){
-           if(c.getIndex() == index){
-               return true;
-           }
-       }
+        for (CHAR c : this.chars) {
+            if (c.getIndex() == index) {
+                return true;
+            }
+        }
         return false;
     }
+
     public double generateIndex(double indexStart, double indexEnd) {
 
         double diff = (indexEnd - indexStart);
@@ -44,16 +54,16 @@ public class CharacterSequence {
         }
         // while (getStartIndex(index))
         // {
-        //     index-=0.01;
+        // index-=0.01;
         // }
         return index;
     }
-    
+
     public CHAR insert(double indexStart, double indexEnd, String charValue, Object attributes, String id) {
         double index = generateIndex(indexStart, indexEnd);
         System.out.println("Insert index: " + index);
-        CHAR charObj = (id != null) ? new CHAR(index, charValue,  id, attributes, id) :
-                new CHAR(index, charValue, id, attributes);
+        CHAR charObj = (id != null) ? new CHAR(index, charValue, id, attributes, id)
+                : new CHAR(index, charValue, id, attributes);
 
         this.chars.add(charObj);
         this.chars.sort(Comparator.comparingDouble(CHAR::getIndex));
@@ -64,7 +74,7 @@ public class CharacterSequence {
         this.chars.add(charObj);
         this.chars.sort(Comparator.comparingDouble(CHAR::getIndex)
                 .thenComparing(CHAR::getSiteID)
-                .reversed()); 
+                .reversed());
     }
 
     public void delete(String id) {
@@ -75,6 +85,7 @@ public class CharacterSequence {
             }
         }
     }
+
     public String getSequence() {
         StringBuilder seq = new StringBuilder();
         for (CHAR c : this.chars) {
@@ -85,22 +96,21 @@ public class CharacterSequence {
         return seq.toString();
     }
 
-
     public List<CHAR> getRelativeIndex(int index) {
         List<CHAR> result = new ArrayList<>();
         int aliveIndex = 0;
         boolean itemsFound = false;
         CHAR charStart = null;
         CHAR charEnd = null;
-        System.out.println("ALOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO"+index);
+        System.out.println("ALOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO" + index);
 
         for (CHAR c : this.chars) {
             if (!c.isFlagDelete()) {
-                System.out.println("zh2ttttttttttttttttt"+aliveIndex);
-                if (aliveIndex > (int)index) {
+                System.out.println("zh2ttttttttttttttttt" + aliveIndex);
+                if (aliveIndex > (int) index) {
                     charEnd = c;
                     itemsFound = true;
-                    System.out.println("mashy "+c.getChar());
+                    System.out.println("mashy " + c.getChar());
                     break;
                 } else {
                     charStart = c;
@@ -108,15 +118,14 @@ public class CharacterSequence {
                 aliveIndex++;
             }
         }
-      
 
         if (!itemsFound && aliveIndex >= index) {
             charEnd = this.chars.get(this.chars.size() - 1);
             itemsFound = true;
         }
-       
+
         if (charStart != null && charEnd != null) {
-            System.out.println("start Character"+charStart.getChar());
+            System.out.println("start Character" + charStart.getChar());
             result.add(charStart);
             result.add(charEnd);
             return result;
@@ -146,7 +155,7 @@ public class CharacterSequence {
             return aliveIndex - 1;
         } else {
             throw new IllegalArgumentException("Failed to find relative index");
-        }
-    }
+  }
+}
 
 }
