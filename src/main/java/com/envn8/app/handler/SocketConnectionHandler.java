@@ -13,6 +13,7 @@ import com.envn8.app.models.CharacterSequence;
 import com.envn8.app.service.DocumentService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Map;
+import java.util.Comparator;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.SendTo;
@@ -48,6 +49,7 @@ public class SocketConnectionHandler extends TextWebSocketHandler implements App
         
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
         System.out.println("afterConnectionClosed");
@@ -55,9 +57,15 @@ public class SocketConnectionHandler extends TextWebSocketHandler implements App
         super.afterConnectionClosed(session, status);
         if (!documentRooms.isEmpty() && documentRooms.contains(session)) {
             System.out.println("HENAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
+            List<CHAR> contentList = (List<CHAR>)session.getAttributes().get("sequence");
+            List<CHAR> newList = new ArrayList<>();
+            if (contentList.size() > 2) {
+                newList = contentList.subList(1, contentList.size() - 1);
+            }
+            saveDocument((String)session.getAttributes().get("documentId"),newList);
             documentRooms.remove(session);
             removeSessionFromRooms(session);
-            System.out.println("   B3d    HENAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
+            System.out.println("   B3d  HENAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA ");
         }
     }
 
@@ -118,7 +126,9 @@ public class SocketConnectionHandler extends TextWebSocketHandler implements App
             TextMessage updatedSequenceMessage = new TextMessage(messageContent);
             System.out.println("final string is "+updatedSequenceMessage);
             sendMessage(documentId, updatedSequenceMessage);
-          
+            System.out.println("Data Saved  "+sequences.getContent());
+            session.getAttributes().put("sequence", sequences.getContent());
+            session.getAttributes().put("documentId",documentId);
 
         }else if(operationType.equals("deleteCharacter")){
             int index = (int) operation.get("indexStart");
@@ -131,12 +141,17 @@ public class SocketConnectionHandler extends TextWebSocketHandler implements App
             TextMessage updatedSequenceMessage = new TextMessage(messageContent);
             System.out.println("final string is "+updatedSequenceMessage);
             sendMessage(documentId, updatedSequenceMessage);
-            saveDocument(documentId, sequences.getContent());
+            session.getAttributes().put("sequence", sequences.getContent());
+            session.getAttributes().put("documentId",documentId);
+
         }
         }else{
             String messageContent = objectMapper.writeValueAsString(sequences.getContent());
             TextMessage updatedSequenceMessage = new TextMessage(messageContent);
             sendMessage(documentId, updatedSequenceMessage);
+            sequences.getContent().sort(Comparator.comparingDouble(CHAR::getIndex));
+            session.getAttributes().put("sequence", sequences.getContent());
+            session.getAttributes().put("documentId",documentId);
         }
 
     }
@@ -168,11 +183,11 @@ public class SocketConnectionHandler extends TextWebSocketHandler implements App
     }
 
     private void saveDocument(String documentId, List<CHAR> content) {
+        System.out.println("Saving document");
         documentService.getDocumentById(documentId).ifPresent(document -> {
             document.setContent(content);
             documentService.updateDocument(document);
         });
-        // documentService.updateDocument(documentId, content);
-}
+    }
 
 }

@@ -55,43 +55,5 @@ public class DocumentService {
 }
 }
 
-    // public String getContent(String documentId) {
-
-    //     Optional<Documents> document = documentRepository.findById(documentId);
-    //     if (document.isEmpty()) {
-    //         System.err.println("Document not found");
-    //         return null;
-    //     }
-    //     Documents doc = document.get();
-    //     return doc.getContent().stream()
-    //             .map(crdt -> String.valueOf(crdt.getCharacter())) // Convert each character to a string
-    //             .collect(Collectors.joining()); // Join all characters in the document
-    // }
-
-    // public void insertCharacter(String documentId, int position, String beforeId, String afterId, char character) {
-    //     System.out.println("ZEMEELYYYYYYYYYyyyyyyyyyyyyyyy "+documentId+" "+position+" "+" "+beforeId+" "+afterId+" "+character);
-    //     Documents document = documentRepository.findById(documentId).orElseThrow();
-    //     String newId = CRDT.generateIdBetween(beforeId, afterId);
-    //     CRDT newElement = new CRDT(character, newId, beforeId, afterId);
-    //     System.out.println("Yarab"+newElement.getCharacter()+"basha     "+newId);
-    //     document.getContent().add(position, newElement);
-    //     document.getContent().sort(Comparator.comparing(CRDT::getId));
-
-    //     System.out.println("ETB3 DOCUMENT"+document.getContent());
-    //     documentRepository.save(document);
-    // }
-
-    // public void deleteCharacter(String documentId, String characterId) {
-    //     Optional<Documents> document = documentRepository.findById(documentId);
-    //     if (document.isEmpty()) {
-    //         System.err.println("Document not found");
-    //         return;
-    //     } else {
-    //         System.out.println("Document found");
-    //         Documents doc = document.get();
-    //         doc.getContent().removeIf(crdt -> crdt.getId().equals(characterId));
-    //         documentRepository.save(doc);
-    //     }
-    // }
 
 }
