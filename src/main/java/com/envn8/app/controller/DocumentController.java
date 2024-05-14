@@ -425,4 +425,36 @@ public class DocumentController {
         }
     }
 
+    @GetMapping("/getUserNameFromToken")
+    public ResponseEntity<?> getUserNameFromToken(@RequestHeader("Authorization") String token) {
+        String actualToken = token.replace("Bearer ", "");
+        String username = jwtService.extractUsername(actualToken);
+        return new ResponseEntity<>(username, HttpStatus.OK);
+    }
+
+    @GetMapping("/getUserAccessLevel/{id}")
+    public ResponseEntity<?> getUserAccessLevel(@PathVariable String id,
+            @RequestHeader("Authorization") String token) {
+        String actualToken = token.replace("Bearer ", "");
+        String username = jwtService.extractUsername(actualToken);
+        if(actualToken == null || actualToken.isEmpty()) {
+            return new ResponseEntity<>("Token is null or empty", HttpStatus.UNAUTHORIZED);
+        }
+        Optional<Documents> documentOptional = documentService.getDocumentById(id);
+        if (documentOptional.isPresent()) {
+            Documents document = documentOptional.get();
+            if (document.getOwner().getUsername().equals(username)) {
+                return new ResponseEntity<>("OWNER", HttpStatus.OK);
+            } else if (document.getSharedWith().stream().anyMatch(user -> user.getUsername().equals(username))) {
+                //if shared but their permission is EDITOR, return 'Editor', if Viewer, return Viewer
+                return new ResponseEntity<>(document.getPermissions().get(userService.getUserByUsername(username).getId()), HttpStatus.OK);
+                // return new ResponseEntity<>("Shared", HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>("No access", HttpStatus.OK);
+            }
+        } else {
+            return new ResponseEntity<>("Document not found", HttpStatus.NOT_FOUND);
+        }
+    }
+
 }
