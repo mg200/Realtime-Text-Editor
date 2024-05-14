@@ -42,13 +42,17 @@ public class AuthenticationService {
                                         .token("Email already exists")
                                         .build();
                 }
+                Role r=Role.USER;
+                if (request.getRole() == "ADMIN") {
+                        r = Role.ADMIN;
+                }
                 var user = User.builder()
                                 .firstName(request.getFirstname())
                                 .lastName(request.getLastname())
                                 .email(request.getEmail())
                                 .password(passwordEncoder.encode(request.getPassword()))
                                 .username(request.getUsername())
-                                .role(Role.USER)
+                                .role(r)
                                 .build();
                 var savedUser = repository.save(user);
                 var jwtToken = jwtService.generateToken(user);

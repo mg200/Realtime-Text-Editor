@@ -54,5 +54,22 @@ public class UserSettingsService {
 
     }
 
+    public Object deleteUser(String token) {
+        if (token == null || token.isEmpty()) {
+            return ResponseEntity.badRequest().body("Token is null or empty");
+        }
+        String actualToken = token.replace("Bearer ", "");
+        String username = jwtService.extractUsername(actualToken);
+        // Load the user details
+        UserDetails userDetails = userservice.getUserByUsername(username);
+        if (userDetails == null) {
+            return ResponseEntity.badRequest().body("User not found");
+        }
+        User user = (User) userDetails;
+        //delete the user, his documents and his topics
+        
+        userRepository.delete(user);
+        return ResponseEntity.ok("User deleted successfully");
+    }
 
 }
