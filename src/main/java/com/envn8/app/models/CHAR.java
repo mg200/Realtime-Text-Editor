@@ -81,6 +81,9 @@ public class CHAR {
     public boolean getBold(){
         return this.bold;
     }
+    public boolean getUnderLine(){
+        return this.underline;
+    }
     public void setFlagDelete(boolean val){
         this.FlagDelete=val;
     }

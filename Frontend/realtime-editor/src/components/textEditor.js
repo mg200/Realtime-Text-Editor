@@ -78,9 +78,7 @@ function getDiff(oldContent, newContent) {
       attributes: {},
       id: operationId,
     };
-  }
-  // If the new content is shorter, it's a delete operation
-  else if (newContent.length < oldContent.length) {
+  } else if (newContent.length < oldContent.length) {
     operationId++;
     return {
       type: "delete",
@@ -146,37 +144,20 @@ const TextEditor = () => {
 
     console.log("Data received henaa:", data);
     if (Array.isArray(data)) {
-      data.slice(1, -1).forEach((item) => {
-        if (
-          item.char != "bof" &&
-          item.char != "eof" &&
-          item.isItalic &&
-          item.bold &&
-          !item.flagDelete
-        ) {
+      data.forEach((item) => {
+        let notBOf = item.char != "bof" && item.char != "eof";
+        if (notBOf && item.isItalic && item.bold && !item.flagDelete) {
           con += `<b><i>${item.char}</i></b>`;
-        } else if (
-          item.char != "bof" &&
-          item.char != "eof" &&
-          item.bold &&
-          !item.flagDelete
-        ) {
+        } else if (notBOf && item.bold && !item.flagDelete) {
           con += `<b>${item.char}</b>`;
-        } else if (
-          item.char != "bof" &&
-          item.char != "eof" &&
-          item.isItalic &&
-          !item.flagDelete
-        ) {
+        } else if (notBOf && item.isItalic && !item.flagDelete) {
           con += `<i>${item.char}</i>`;
-        } else if (
-          item.char != "bof" &&
-          item.char != "eof" &&
-          !item.flagDelete
-        ) {
+        } else if (notBOf && item.underLine && !item.flagDelete) {
+          con += `<u>${item.char}</u>`;
+        } else if (notBOf && !item.flagDelete) {
           con += item.char;
         }
-        if (item.char != "bof" && item.char != "eof" && !item.flagDelete) {
+        if (notBOf && !item.flagDelete) {
           contentBegin += item.char;
         }
       });
@@ -223,10 +204,7 @@ const TextEditor = () => {
       console.log("Received data", event.data);
       const eventData = event.data;
       setDataToBeSaved(eventData);
-      // editor.commands.setContent(extractContent(JSON.parse(eventData)));
       setData(eventData);
-      // let temp = extractContent(JSON.parse(eventData));
-      // setDocumentContent(temp);
     };
     socket.onerror = (error) => {
       console.error("WebSocket error:", error);
@@ -244,13 +222,6 @@ const TextEditor = () => {
     return `${idCounter}`;
   }
 
-  // const interval = setInterval(async () => {
-
-  // }, 10000);
-
-  // useEffect(() => {
-  //   setContent();
-  // }, []);
   const sendContentToServer = (
     operationType,
     indexStart,
@@ -262,6 +233,7 @@ const TextEditor = () => {
     if (socket) {
       const isBold = editor.isActive("bold");
       const isItalic = editor.isActive("italic");
+      const isUnderLine = editor.isActive("underline");
       const data = {
         documentId: documentId,
         operation: {
@@ -269,7 +241,11 @@ const TextEditor = () => {
           indexStart: indexStart,
           indexEnd: indexEnd,
           charValue: character,
-          attributes: { bold: isBold, italic: isItalic },
+          attributes: {
+            bold: isBold,
+            italic: isItalic,
+            underLine: isUnderLine,
+          },
           id: id,
         },
       };
@@ -287,39 +263,7 @@ const TextEditor = () => {
       editor?.commands.setTextSelection(cursor);
     }
   }, [data]);
-  // useEffect(() => {
-  //   if (Document) {
-  //     try {
-  //       // if (
-  //       //   JSON.parse(JSON.parse(Document.content))?.content?.length &&
-  //       //   JSON.parse(JSON.parse(Document.content)).content.length > 0
-  //       // ) {
-  //       //   console.log(
-  //       //     "ALOOO HENA CONTENT ",
-  //       //     JSON.parse(JSON.parse(Document.content))
-  //       //   );
-  //       // editor.commands.setContent(
-  //       //   extractContent(JSON.parse(JSON.parse(Document.content)).content)
-  //       // );
-  //       // }
-  //     } catch (e) {
-  //       console.log("empty data");
-  //     }
-  //   }
-  // }, []);
-  // useEffect(() => {
-  //   const intervalId = setInterval(() => {
-  //     console.log(
-  //       "aywa hena save",
-  //       JSON.stringify(DataTobeSaved),
-  //       oldContent,
-  //       NewContent
-  //     );
-  //     saveContent(JSON.stringify(DataTobeSaved));
-  //   }, 10000);
 
-  //   return () => clearInterval(intervalId);
-  // }, [DataTobeSaved]);
   const editor = useEditor({
     extensions: extensions,
     content: DocumentContent,
