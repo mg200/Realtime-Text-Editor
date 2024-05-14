@@ -23,10 +23,13 @@ import com.envn8.app.models.Documents;
 import com.envn8.app.models.User;
 import com.envn8.app.service.DocumentService;
 import com.envn8.app.service.UserService;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ext.OptionalHandlerFactory;
 
 import lombok.RequiredArgsConstructor;
 
+import com.envn8.app.payload.request.ContentRequest;
 import com.envn8.app.payload.request.DocumentRequest;
 import com.envn8.app.payload.request.ShareDocumentRequest;
 import com.envn8.app.security.config.JwtService;
@@ -64,7 +67,7 @@ public class DocumentController {
         }
 
         User user = (User) userDetails;
-        List<CHAR> content = new ArrayList<>(); // as initially the document is empty
+        String content = ""; // as initially the document is empty
 
         Documents document = Documents.builder()
                 .content(content)
@@ -423,6 +426,25 @@ public class DocumentController {
         } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Document not found");
         }
+    }
+    @PostMapping("/save/{id}")
+    public ResponseEntity<?> saveDocumentContent(@PathVariable String id, @RequestBody String content,
+            @RequestHeader("Authorization") String token) throws JsonProcessingException {
+        Optional<Documents> documentOptional = documentService.getDocumentById(id);
+        System.out.println("Alooooooooooooooooooooooo content eh "+content);
+        if (documentOptional.isPresent()) {
+            Documents document = documentOptional.get();
+
+            // Convert content to JSON string
+            ObjectMapper mapper = new ObjectMapper();
+            String contentJson = mapper.writeValueAsString(content);
+
+            document.setContent(contentJson);
+            documentService.updateDocument(document);
+            return new ResponseEntity<>("Document saved successfully", HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>("Document not found", HttpStatus.NOT_FOUND);
+    }   
     }
 
     @GetMapping("/getUserNameFromToken")

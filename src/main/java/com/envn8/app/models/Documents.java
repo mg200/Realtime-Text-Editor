@@ -30,7 +30,7 @@ public class Documents {
     @Field
     private String title;
     @Field
-    private List<CHAR> content;
+    private String content;
     @Field
     private String type;
 
@@ -50,7 +50,7 @@ public class Documents {
     // public Documents() {
     // }
 
-    public Documents(String title, List<CHAR> content, String type, User owner) {
+    public Documents(String title, String content, String type, User owner) {
         this.title = title;
         this.content = content;
         this.owner = owner;
@@ -75,11 +75,11 @@ public class Documents {
         this.title = newtitle;
     }
 
-    public List<CHAR> getContent() {
+    public String getContent() {
         return content;
     }
 
-    public void setContent(List<CHAR> newcontent) {
+    public void setContent(String newcontent) {
         this.content = newcontent;
     }
 
