@@ -4,6 +4,7 @@ import org.springframework.data.mongodb.core.mapping.DBRef;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -17,6 +18,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
 // import lombok.RequiredArgsConstructor;
 @Data
 @Builder
@@ -38,15 +40,16 @@ public class Documents {
     // @JsonIgnore
     @JsonBackReference
     private User owner;
-    
+
     @DBRef
     // @JsonManagedReference
-    @JsonBackReference//this worked
+    @JsonBackReference // this worked
     private List<User> sharedWith; // This represents the users that the document is shared with
-    // private Map<String, String> permissions; // This represents the permissions of the shared users
+    // private Map<String, String> permissions; // This represents the permissions
+    // of the shared users
     // key is the user id and value is the permission level
 
-    private Map<String,DocPermissions> permissions;
+    private Map<String, DocPermissions> permissions;
     // public Documents() {
     // }
 
@@ -98,6 +101,7 @@ public class Documents {
     public void setType(String newtype) {
         this.type = newtype;
     }
+
     public List<User> getSharedWith() {
         return sharedWith;
     }
@@ -106,11 +110,25 @@ public class Documents {
         this.sharedWith = sharedWith;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+        Documents documents = (Documents) o;
+        return Objects.equals(id, documents.id); // compare only by id
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
     // public Map<String, String> getPermissions() {
-    //     return permissions;
+    // return permissions;
     // }
 
     // public void setPermissions(Map<String, String> permissions) {
-    //     this.permissions = permissions;
+    // this.permissions = permissions;
     // }
 }

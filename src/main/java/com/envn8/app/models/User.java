@@ -3,6 +3,7 @@ package com.envn8.app.models;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -64,7 +65,7 @@ public class User implements UserDetails {
     // might need to be removed
     @DBRef
     private List<Documents> documents = new ArrayList<>(); // This represents the documents that the user owns
-    
+
     @DBRef
     @JsonManagedReference
     private List<Documents> sharedDocuments = new ArrayList<>(); // This represents the documents that are shared with
@@ -173,6 +174,21 @@ public class User implements UserDetails {
     @Override
     public boolean isEnabled() {
         return true;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+        User user = (User) o;
+        return Objects.equals(id, user.id); // compare only by id
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 
 }
