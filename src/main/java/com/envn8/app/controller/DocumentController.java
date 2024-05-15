@@ -474,7 +474,10 @@ public class DocumentController {
             } else {
                 return new ResponseEntity<>("No access", HttpStatus.OK);
             }
-        } else {
+        } else {  
+
+
+            
             return new ResponseEntity<>("Document not found", HttpStatus.NOT_FOUND);
         }
     }
