@@ -289,7 +289,7 @@ const TextEditor = () => {
       editor?.commands.setTextSelection(cursor);
     }
   }, [data]);
-
+const NOTEditable=permission!=="VIEWER";
   const editor = useEditor({
     extensions: extensions,
     content: DocumentContent,
@@ -346,7 +346,10 @@ const TextEditor = () => {
       {
         console.log("editPermission in HTML", editPermission)
       }
-      <EditorContent editor={editor} readOnly={permission==="VIEWER"} className="border-none" />
+      {
+        console.log("editable in HTML", editable)
+      }
+      <EditorContent editor={editor} readOnly={NOTEditable} className="border-none" />
     </div>
   );
 };
