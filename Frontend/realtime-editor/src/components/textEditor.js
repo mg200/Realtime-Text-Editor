@@ -357,7 +357,8 @@ const TextEditor = () => {
             : ''
         )
     }
-      <EditorContent editor={editor} readOnly={editor.options.editable && editPermission} className="border-none" />
+      <EditorContent editor={editor} readOnly={!editPermission} className="border-none" />
+      {/* <EditorContent editor={editor} readOnly={editor.options.editable && editPermission} className="border-none" /> */}
       {/* {permission ? <EditorContent editor={editor} className="border-none" /> : <div>Determining access permissions, please wait!...</div>} */}
     </div>
   );
