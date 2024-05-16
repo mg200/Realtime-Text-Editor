@@ -86,7 +86,7 @@ export default function Navbar() {
             <div className="nav-link" onClick={logout}>
               <div>
                 <i className="fas fa-bell fa-lg mb-1"></i>
-                <span className="badge rounded-pill badge-notification bg-info">
+                <span className="badge rounded-pill badge-notification bg-info" style={{ height: '40px', display: 'inline-block', lineHeight: '30px', marginLeft: '-10px', marginTop: '10px' }}>
                   Logout
                 </span>
               </div>

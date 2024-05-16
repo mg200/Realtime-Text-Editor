@@ -64,7 +64,7 @@ function App() {
           res.data.map((doc) => ({
             id: doc.id,
             title: doc.title,
-            content: doc.content,
+            // content: doc.content,
           }))
         );
       } catch (error) {
@@ -95,7 +95,7 @@ function App() {
           res.data.map((doc) => ({
             id: doc.id,
             title: doc.title,
-            content: doc.content,
+            // content: doc.content,
           }))
         );
       } catch (error) {

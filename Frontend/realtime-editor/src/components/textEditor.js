@@ -205,16 +205,16 @@ const TextEditor = () => {
 
       console.log("res.data", res.data);
       setpermission(res.data);
-      if(res.data==="EDITOR" || res.data==="OWNER"){
+      if (res.data === "EDITOR" || res.data === "OWNER") {
         setEditPermission(true);
       }
-      
-      console.log("permission", permission);
+
+      // console.log("permission", permission);
 
     };
 
     fetchData();
-  }, [documentId]);
+  }, [documentId]);
 
   useEffect(() => {
     const socket = new WebSocket(`ws://localhost:8000/api/topic`);
@@ -289,11 +289,11 @@ const TextEditor = () => {
       editor?.commands.setTextSelection(cursor);
     }
   }, [data]);
-const NOTEditable=permission!=="VIEWER";
+  // const NOTEditable=permission!=="VIEWER";
   const editor = useEditor({
     extensions: extensions,
     content: DocumentContent,
-    editable: permission!=="VIEWER",
+    editable: permission !== "VIEWER",
     onUpdate: ({ editor }) => {
       const newContent = editor.getText();
       console.log("contenttttttttttt", content, "Sssss", newContent);
@@ -344,12 +344,21 @@ const NOTEditable=permission!=="VIEWER";
         console.log("permission in HTML", permission)
       }
       {
+        console.log("isVIEWER", permission === "VIEWER")
+      }
+      {
         console.log("editPermission in HTML", editPermission)
       }
       {
-        console.log("editable in HTML", editable)
-      }
-      <EditorContent editor={editor} readOnly={NOTEditable} className="border-none" />
+        // console.log("editor.options.editable", editor.options.editable)
+        console.log(
+          editor && editor.options && editor.options.editable !== null 
+            ? "editor.options.editable: " + editor.options.editable 
+            : ''
+        )
+    }
+      <EditorContent editor={editor} readOnly={editor.options.editable && editPermission} className="border-none" />
+      {/* {permission ? <EditorContent editor={editor} className="border-none" /> : <div>Determining access permissions, please wait!...</div>} */}
     </div>
   );
 };
