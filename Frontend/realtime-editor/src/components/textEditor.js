@@ -293,7 +293,7 @@ const TextEditor = () => {
   const editor = useEditor({
     extensions: extensions,
     content: DocumentContent,
-    editable: permission !== "VIEWER",
+    editable: editPermission,
     onUpdate: ({ editor }) => {
       const newContent = editor.getText();
       console.log("contenttttttttttt", content, "Sssss", newContent);
