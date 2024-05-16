@@ -36,8 +36,8 @@ function App() {
         console.log("Fetched shared:", res.data);
       } catch (error) {
         if (error.response.status === 403) {
-          alert("Your Session expired. Logging out...");
-          logout();
+          // alert("Your Session expired. Logging out...");
+          // logout();
         } else {
           console.error("Error fetching owned documents:", error);
         }
@@ -100,9 +100,9 @@ function App() {
         );
       } catch (error) {
         if (error.response.status === 403) {
-          alert("Your Session expired. Logging out...");
+          // alert("Your Session expired. Logging out...");
           // console.error("Token expired. Logging out...");
-          logout();
+          // logout();
         } else {
           console.error("Error fetching owned documents:", error);
         }
@@ -200,6 +200,7 @@ function App() {
             onRename={handleRename}
             onShare={handleShareRequest}
             onOpen={handleOpen}
+            isOwned={true}
           />
 
           <h2>Shared With You</h2>

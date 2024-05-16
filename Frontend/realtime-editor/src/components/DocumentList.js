@@ -7,7 +7,7 @@ import { FaRegFolderOpen } from "react-icons/fa";
 import Rename from "./Rename";
 import Share from "./share";
 
-function DocumentList({ documents, onDelete, onRename, onShare, onOpen }) {
+function DocumentList({ documents, onDelete, onRename, onShare, onOpen, isOwned }) {
   const [isRenameVisible, setRenameVisible] = useState(false);
   const [isShareVisible, setShareVisible] = useState(false);
   const [selectedDocId, setSelectedDocId] = useState(null);
@@ -41,49 +41,52 @@ function DocumentList({ documents, onDelete, onRename, onShare, onOpen }) {
               style={{ backgroundColor: "#DCDCDC" }}
             >
               <div className="mt-2">
-                <Button
-                  variant="danger"
-                  size="sm"
-                  className="mx-1 rounded-5 p-2 m-1"
-                  onClick={() => onDelete(doc.id)}
-                >
-                  <MdDelete />
-                  Delete
-                </Button>
-                <Button
-                  variant="warning"
-                  size="sm"
-                  className="mx-1 rounded-5 p-2 m-1"
-                  onClick={() => {
-                    setSelectedDocId(doc.id);
-                    setRenameVisible(true);
-                  }}
-                >
-                  <MdDriveFileRenameOutline /> Rename
-                </Button>
-                <Rename
-                  show={isRenameVisible}
-                  handleClose={() => setRenameVisible(false)}
-                  HandleSubmit={handleRename}
-                />
-
-                <Button
-                  variant="info"
-                  size="sm"
-                  className="mx-1 rounded-5 p-2 m-1"
-                  onClick={() => {
-                    setSelectedDocId(doc.id);
-                    setShareVisible(true);
-                  }}
-                >
-                  <FaRegShareSquare />
-                  Share
-                </Button>
-                <Share
-                  show={isShareVisible}
-                  handleClose={() => setShareVisible(false)}
-                  HandleSubmit={handleShare}
-                />
+                {isOwned && (
+                  <>
+                    <Button
+                      variant="danger"
+                      size="sm"
+                      className="mx-1 rounded-5 p-2 m-1"
+                      onClick={() => onDelete(doc.id)}
+                    >
+                      <MdDelete />
+                      Delete
+                    </Button>
+                    <Button
+                      variant="warning"
+                      size="sm"
+                      className="mx-1 rounded-5 p-2 m-1"
+                      onClick={() => {
+                        setSelectedDocId(doc.id);
+                        setRenameVisible(true);
+                      }}
+                    >
+                      <MdDriveFileRenameOutline /> Rename
+                    </Button>
+                    <Rename
+                      show={isRenameVisible}
+                      handleClose={() => setRenameVisible(false)}
+                      HandleSubmit={handleRename}
+                    />
+                    <Button
+                      variant="info"
+                      size="sm"
+                      className="mx-1 rounded-5 p-2 m-1"
+                      onClick={() => {
+                        setSelectedDocId(doc.id);
+                        setShareVisible(true);
+                      }}
+                    >
+                      <FaRegShareSquare />
+                      Share
+                    </Button>
+                    <Share
+                      show={isShareVisible}
+                      handleClose={() => setShareVisible(false)}
+                      HandleSubmit={handleShare}
+                    />
+                  </>
+                )}
                 <Button
                   variant="primary"
                   size="sm"
