@@ -23,7 +23,13 @@ export default function Login() {
       const { token } = res.data;
       console.log("res is", res.data);
       localStorage.setItem("token", token);
-      console.log("Token saved in localStorage:", token);
+      //if the response is OK and has logged in, save the username in localStorage 
+      if (res.status === 200){
+        localStorage.setItem("username", values.username);
+      }
+      // localStorage.setItem("username",res);
+      // console.log("values.username", values.username, "getlocal", localStorage.getItem("username"));
+      // console.log("Token saved in localStorage:", token);
       console.log(res.data);
       window.location.href = "/";
     } catch (error) {

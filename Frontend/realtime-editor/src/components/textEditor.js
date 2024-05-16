@@ -189,6 +189,32 @@ const TextEditor = () => {
       console.error("Error:", error);
     }
   };
+  const [permission, setpermission] = useState('');
+  const [editPermission, setEditPermission] = useState(false);
+  useEffect(() => {
+    const fetchData = async () => {
+      const token = localStorage.getItem("token");
+      const res = await axios.get(
+        process.env.REACT_APP_API_URL + `/dc/getUserAccessLevel/${documentId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      console.log("res.data", res.data);
+      setpermission(res.data);
+      if(res.data==="EDITOR" || res.data==="OWNER"){
+        setEditPermission(true);
+      }
+      
+      console.log("permission", permission);
+
+    };
+
+    fetchData();
+  }, [documentId]);
 
   useEffect(() => {
     const socket = new WebSocket(`ws://localhost:8000/api/topic`);
@@ -267,6 +293,7 @@ const TextEditor = () => {
   const editor = useEditor({
     extensions: extensions,
     content: DocumentContent,
+    editable: permission!=="VIEWER",
     onUpdate: ({ editor }) => {
       const newContent = editor.getText();
       console.log("contenttttttttttt", content, "Sssss", newContent);
@@ -312,7 +339,14 @@ const TextEditor = () => {
   return (
     <div className="container border mt-4 vh-100 w-50">
       <MenuBar editor={editor} />
-      <EditorContent editor={editor} className="border-none" />
+      {/* <EditorContent editor={editor} className="border-none" /> */}
+      {
+        console.log("permission in HTML", permission)
+      }
+      {
+        console.log("editPermission in HTML", editPermission)
+      }
+      <EditorContent editor={editor} readOnly={permission==="VIEWER"} className="border-none" />
     </div>
   );
 };
