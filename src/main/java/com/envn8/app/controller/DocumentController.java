@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -92,10 +93,10 @@ public class DocumentController {
     public ResponseEntity<Documents> viewDocument(@PathVariable String id,
             @RequestHeader("Authorization") String token) {
         String actualToken = token.replace("Bearer ", "");
-        if(actualToken == null || actualToken.isEmpty()) {
+        if (actualToken == null || actualToken.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
-        if(id == null || id.isEmpty()) {
+        if (id == null || id.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
         String username = jwtService.extractUsername(actualToken);
@@ -115,28 +116,58 @@ public class DocumentController {
         }
     }
 
+    // @GetMapping("/viewAll")
+    // public ResponseEntity<Iterable<Documents>>
+    // viewAllDocuments(@RequestHeader("Authorization") String token) {
+    // System.out.println("at the start of viewAllDocuments()");
+    // String actualToken = token.replace("Bearer ", "");
+    // String username = jwtService.extractUsername(actualToken);
+    // System.out.println("username: " + username + " token: " + actualToken);
+    // User user = userService.getUserByUsername(username); // Get
+    // Iterable<Documents> documents = user.getDocuments();
+    // // size of documents
+    // int size = (int) documents.spliterator().getExactSizeIfKnown();
+    // // System.out.println("Size of documents: " + size);
+    // if (size != 0) {
+    // System.out.println("Documents is not null");
+    // for (Documents doc : documents) {
+    // System.out.println("Document title: " + doc.getTitle());
+    // }
+    // } else {
+    // logger.error("Documents is null");
+    // }
+    // // System.out.println("log at the end of viewAllDocuments()");
+
+    // return new ResponseEntity<>(documents, HttpStatus.OK);
+    // }
+
     @GetMapping("/viewAll")
-    public ResponseEntity<Iterable<Documents>> viewAllDocuments(@RequestHeader("Authorization") String token) {
-        System.out.println("at the start of viewAllDocuments()");
+    public ResponseEntity<Iterable<Map<String, String>>> viewAllDocuments(
+            @RequestHeader("Authorization") String token) {
         String actualToken = token.replace("Bearer ", "");
         String username = jwtService.extractUsername(actualToken);
-        System.out.println("username: " + username + " token: " + actualToken);
-        User user = userService.getUserByUsername(username); // Get
+        User user = userService.getUserByUsername(username); // Get the current user
         Iterable<Documents> documents = user.getDocuments();
-        // size of documents
-        int size = (int) documents.spliterator().getExactSizeIfKnown();
-        // System.out.println("Size of documents: " + size);
-        if (size != 0) {
-            System.out.println("Documents is not null");
-            for (Documents doc : documents) {
-                System.out.println("Document title: " + doc.getTitle());
-            }
-        } else {
-            logger.error("Documents is null");
-        }
-        // System.out.println("log at the end of viewAllDocuments()");
+        List<Map<String, String>> result = new ArrayList<>();
+        documents.forEach(doc -> {
+            Map<String, String> map = new HashMap<>();
+            map.put("id", doc.getId());
+            map.put("title", doc.getTitle());
+            result.add(map);
+        });
+        return new ResponseEntity<>(result, HttpStatus.OK);
+    }
 
-        return new ResponseEntity<>(documents, HttpStatus.OK);
+    //get doc name from ID 
+    @GetMapping("/getDocName/{id}")
+    public ResponseEntity<?> getDocName(@PathVariable String id) {
+        Optional<Documents> documentOptional = documentService.getDocumentById(id);
+        if (documentOptional.isPresent()) {
+            Documents document = documentOptional.get();
+            return new ResponseEntity<>(document.getTitle(), HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>("Document not found", HttpStatus.NOT_FOUND);
+        }
     }
 
     // function to delete a document
@@ -151,7 +182,8 @@ public class DocumentController {
             Documents document = documentOptional.get();
             if (document.getOwner().getUsername().equals(username)) {
                 documentService.deleteDocument(id);
-                //loop over the users with whom the document is shared and remove the document from their shared documents
+                // loop over the users with whom the document is shared and remove the document
+                // from their shared documents
                 for (User user : document.getSharedWith()) {
                     user.getSharedDocuments().remove(document);
                     userService.saveUser(user);
@@ -256,18 +288,40 @@ public class DocumentController {
         }
     }
 
+    // @GetMapping("/viewShared")
+    // public ResponseEntity<Iterable<Documents>>
+    // viewSharedDocuments(@RequestHeader("Authorization") String token) {
+    // String actualToken = token.replace("Bearer ", "");
+    // String username = jwtService.extractUsername(actualToken);
+    // User user = userService.getUserByUsername(username); // Get the current user
+    // if (user != null) {
+    // // System.out.println("User is not null");
+    // Iterable<Documents> sharedDocuments = user.getSharedDocuments();
+    // // System.out.println("Shared documents size" +
+    // // sharedDocuments.spliterator().getExactSizeIfKnown());
+    // // sharedDocuments.forEach(doc -> System.out.println(doc.getTitle()));
+    // return new ResponseEntity<>(sharedDocuments, HttpStatus.OK);
+    // } else {
+    // return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+    // }
+    // }
+
     @GetMapping("/viewShared")
-    public ResponseEntity<Iterable<Documents>> viewSharedDocuments(@RequestHeader("Authorization") String token) {
+    public ResponseEntity<Iterable<Map<String, String>>> viewSharedDocuments(
+            @RequestHeader("Authorization") String token) {
         String actualToken = token.replace("Bearer ", "");
         String username = jwtService.extractUsername(actualToken);
         User user = userService.getUserByUsername(username); // Get the current user
         if (user != null) {
-            // System.out.println("User is not null");
             Iterable<Documents> sharedDocuments = user.getSharedDocuments();
-            // System.out.println("Shared documents size" +
-            // sharedDocuments.spliterator().getExactSizeIfKnown());
-            // sharedDocuments.forEach(doc -> System.out.println(doc.getTitle()));
-            return new ResponseEntity<>(sharedDocuments, HttpStatus.OK);
+            List<Map<String, String>> result = new ArrayList<>();
+            sharedDocuments.forEach(doc -> {
+                Map<String, String> map = new HashMap<>();
+                map.put("id", doc.getId());
+                map.put("title", doc.getTitle());
+                result.add(map);
+            });
+            return new ResponseEntity<>(result, HttpStatus.OK);
         } else {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
@@ -317,10 +371,10 @@ public class DocumentController {
 
     @GetMapping("/isDocSharedWithUser/{id}")
     public boolean isDocSharedWithUser(@PathVariable String id,
-    @RequestHeader("Authorization") String token){
-        String actualToken=token.replace("Bearer ","");
-        String username=jwtService.extractUsername(actualToken);
-        if(actualToken==null || actualToken.isEmpty()){
+            @RequestHeader("Authorization") String token) {
+        String actualToken = token.replace("Bearer ", "");
+        String username = jwtService.extractUsername(actualToken);
+        if (actualToken == null || actualToken.isEmpty()) {
             return false;
         }
         Optional<Documents> documentOptional = documentService.getDocumentById(id);
@@ -374,7 +428,8 @@ public class DocumentController {
         Optional<Documents> documentOptional = documentService.getDocumentById(id);
         if (documentOptional.isPresent()) {
             Documents document = documentOptional.get();
-            // List<CRDT> content = document.getContent(); // Assuming content is a property of Documents entity
+            // List<CRDT> content = document.getContent(); // Assuming content is a property
+            // of Documents entity
             return new ResponseEntity<>("aloooo ya habeby", HttpStatus.OK);
         } else {
             return new ResponseEntity<>("Document not found", HttpStatus.NOT_FOUND);
@@ -391,7 +446,7 @@ public class DocumentController {
         if (documentOptional.isPresent()) {
             Documents document = documentOptional.get();
             if (document.getOwner().getUsername().equals(username)) {
-                if(document.getType().equals("public")) {
+                if (document.getType().equals("public")) {
                     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Document is already public");
                 }
                 document.setType("public");
@@ -414,7 +469,7 @@ public class DocumentController {
         if (documentOptional.isPresent()) {
             Documents document = documentOptional.get();
             if (document.getOwner().getUsername().equals(username)) {
-                if(document.getType().equals("private")) {
+                if (document.getType().equals("private")) {
                     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Document is already private");
                 }
                 document.setType("private");
@@ -428,23 +483,25 @@ public class DocumentController {
         }
     }
     // @PostMapping("/save/{id}")
-    // public ResponseEntity<?> saveDocumentContent(@PathVariable String id, @RequestBody String content,
-    //         @RequestHeader("Authorization") String token) throws JsonProcessingException {
-    //     Optional<Documents> documentOptional = documentService.getDocumentById(id);
-    //     System.out.println("Alooooooooooooooooooooooo content eh "+content);
-    //     if (documentOptional.isPresent()) {
-    //         Documents document = documentOptional.get();
+    // public ResponseEntity<?> saveDocumentContent(@PathVariable String id,
+    // @RequestBody String content,
+    // @RequestHeader("Authorization") String token) throws JsonProcessingException
+    // {
+    // Optional<Documents> documentOptional = documentService.getDocumentById(id);
+    // System.out.println("Alooooooooooooooooooooooo content eh "+content);
+    // if (documentOptional.isPresent()) {
+    // Documents document = documentOptional.get();
 
-    //         // Convert content to JSON string
-    //         ObjectMapper mapper = new ObjectMapper();
-    //         String contentJson = mapper.writeValueAsString(content);
+    // // Convert content to JSON string
+    // ObjectMapper mapper = new ObjectMapper();
+    // String contentJson = mapper.writeValueAsString(content);
 
-    //         document.setContent(contentJson);
-    //         documentService.updateDocument(document);
-    //         return new ResponseEntity<>("Document saved successfully", HttpStatus.OK);
-    //     } else {
-    //         return new ResponseEntity<>("Document not found", HttpStatus.NOT_FOUND);
-    // }   
+    // document.setContent(contentJson);
+    // documentService.updateDocument(document);
+    // return new ResponseEntity<>("Document saved successfully", HttpStatus.OK);
+    // } else {
+    // return new ResponseEntity<>("Document not found", HttpStatus.NOT_FOUND);
+    // }
     // }
 
     @GetMapping("/getUserNameFromToken")
@@ -459,7 +516,7 @@ public class DocumentController {
             @RequestHeader("Authorization") String token) {
         String actualToken = token.replace("Bearer ", "");
         String username = jwtService.extractUsername(actualToken);
-        if(actualToken == null || actualToken.isEmpty()) {
+        if (actualToken == null || actualToken.isEmpty()) {
             return new ResponseEntity<>("Token is null or empty", HttpStatus.UNAUTHORIZED);
         }
         Optional<Documents> documentOptional = documentService.getDocumentById(id);
@@ -468,16 +525,16 @@ public class DocumentController {
             if (document.getOwner().getUsername().equals(username)) {
                 return new ResponseEntity<>("OWNER", HttpStatus.OK);
             } else if (document.getSharedWith().stream().anyMatch(user -> user.getUsername().equals(username))) {
-                //if shared but their permission is EDITOR, return 'Editor', if Viewer, return Viewer
-                return new ResponseEntity<>(document.getPermissions().get(userService.getUserByUsername(username).getId()), HttpStatus.OK);
+                // if shared but their permission is EDITOR, return 'Editor', if Viewer, return
+                // Viewer
+                return new ResponseEntity<>(
+                        document.getPermissions().get(userService.getUserByUsername(username).getId()), HttpStatus.OK);
                 // return new ResponseEntity<>("Shared", HttpStatus.OK);
             } else {
                 return new ResponseEntity<>("No access", HttpStatus.OK);
             }
-        } else {  
+        } else {
 
-
-            
             return new ResponseEntity<>("Document not found", HttpStatus.NOT_FOUND);
         }
     }

@@ -6,12 +6,54 @@ import { FaSignInAlt } from "react-icons/fa";
 import { RiFileEditFill } from "react-icons/ri";
 import { AuthContext } from "./AuthProvider";
 import { Link } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import NameBar from "./nameBar";
+const [docName, setDocName] = useState('');
 
 export default function Navbar() {
   const { isAuthenticated, logout } = useContext(AuthContext);
   const userName = localStorage.getItem("username");
+  const location = useLocation();
   console.log("userName in navbar", userName);
+  // async function getDocName(id) {
+  //   if (!isAuthenticated || !location.pathname.includes('dc/view')) {
+  //     return;
+  //   }
+
+  //   const response = await fetch(process.env.REACT_APP_API_URL+`getDocName/${id}`);
+
+  //   if (!response.ok) {
+  //     throw new Error(`HTTP error! status: ${response.status}`);
+  //   }
+
+  //   const doc = await response.json();
+
+  //   return doc.name;
+  // }
+
+  // const getDocName = async (id) => {
+  //   if (!isAuthenticated || !location.pathname.includes('dc/view')) {
+  //     return;
+  //   }
+
+  //   const response = await fetch( `/getDocName/${id}`);
+
+  //   if (!response.ok) {
+  //     throw new Error(`HTTP error! status: ${response.status}`);
+  //   }
+
+  //   const doc = await response.json();
+
+  //   return doc.name;
+  // }
+
+  
+
+  useEffect(() => {
+    getDocName(documentId).then(setDocName);
+  }, [documentId, isAuthenticated, location]);
+
+
 
   return (
     <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
@@ -23,7 +65,7 @@ export default function Navbar() {
 
         {!isAuthenticated ? (
           // ... your code for the not authenticated state
-                  <>
+          <>
             <button
               className="navbar-toggler text-primary me-5"
               type="button"
@@ -67,6 +109,11 @@ export default function Navbar() {
           </>
         ) : (
           <div className="d-flex align-items-center">
+            {isAuthenticated && location.pathname.includes('dc/view') && (
+              <div style={{ marginRight: '20px' }}>
+                <input type="text" value="Hello World" readOnly />
+              </div>
+            )}
             <div style={{
               width: '40px',
               height: '40px',
@@ -79,10 +126,11 @@ export default function Navbar() {
               fontSize: '20px',
               fontWeight: 'bold',
               backgroundColor: 'white',
-            }}title={userName}>
+            }} title={userName}>
               {userName ? userName.charAt(0).toUpperCase() : ''}
             </div>
             {userName}
+
             <div className="nav-link" onClick={logout}>
               <div>
                 <i className="fas fa-bell fa-lg mb-1"></i>
@@ -92,9 +140,10 @@ export default function Navbar() {
               </div>
               <IoMdLogIn />
             </div>
+
           </div>
         )}
       </div>
- </nav>
- );
+    </nav>
+  );
 }

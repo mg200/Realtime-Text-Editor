@@ -59,6 +59,9 @@ public class SocketConnectionHandler extends TextWebSocketHandler implements App
             System.out.println("HENAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
             List<CHAR> contentList = (List<CHAR>)session.getAttributes().get("sequence");
             List<CHAR> newList = new ArrayList<>();
+            if(contentList==null){
+                return;
+            }
             if (contentList.size() > 2) {
                 newList = contentList.subList(1, contentList.size() - 1);
             }
