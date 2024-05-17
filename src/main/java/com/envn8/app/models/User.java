@@ -9,14 +9,13 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.OneToMany;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import jakarta.validation.constraints.Pattern;
 
 import org.springframework.data.annotation.Id;
@@ -31,7 +30,7 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 @Data
 @Builder
-@NoArgsConstructor // might need to be removed
+@RequiredArgsConstructor
 @AllArgsConstructor
 @Entity
 @Document(collection = "users")
@@ -61,87 +60,18 @@ public class User implements UserDetails {
 
     @Enumerated(EnumType.STRING)
     private Role role;
-    // note as of 27/4, I initialized these lists to avoid null pointer exceptions,
-    // might need to be removed
     @DBRef
+    @Builder.Default
     private List<Documents> documents = new ArrayList<>(); // This represents the documents that the user owns
 
     @DBRef
     @JsonManagedReference
+    @Builder.Default
     private List<Documents> sharedDocuments = new ArrayList<>(); // This represents the documents that are shared with
                                                                  // the user
 
     @DBRef
     private List<Token> tokens;
-
-    @Override
-    public String getUsername() {
-        return username;
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public String getFirstName() {
-        return firstName;
-    }
-
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
-
-    // public String getUsername() {
-    // return username;
-    // }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public List<Documents> getDocuments() {
-        return documents;
-    }
-
-    public void setDocuments(List<Documents> documents) {
-        this.documents = documents;
-    }
-
-    public List<Documents> getSharedDocuments() {
-        return sharedDocuments;
-    }
-
-    public void setSharedDocuments(List<Documents> sharedDocuments) {
-        this.sharedDocuments = sharedDocuments;
-    }
 
     @Override
     public String toString() {
@@ -151,8 +81,6 @@ public class User implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        // System.out.println("Role: " + role+"exception here ");
-        // System.out.println("Role: " + role.name());
         return List.of(new SimpleGrantedAuthority(role.name()));
     }
 

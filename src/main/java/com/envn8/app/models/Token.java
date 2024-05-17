@@ -21,13 +21,13 @@ import lombok.NoArgsConstructor;
 public class Token {
 
   @Id
-  public ObjectId id;//objectID to ensure uniqueness of the ID from the User ID
+  public ObjectId id;// objectID to ensure uniqueness of the ID from the User ID
 
   @Column(unique = true)
   public String token;
 
   @Enumerated(EnumType.STRING)
-  public TokenType tokenType = TokenType.BEARER;
+  public TokenType tokenType;// = TokenType.BEARER;
 
   public boolean revoked;
 

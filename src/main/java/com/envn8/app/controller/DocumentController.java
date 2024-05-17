@@ -1,13 +1,8 @@
 package com.envn8.app.controller;
 
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.messaging.handler.annotation.DestinationVariable;
-import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.handler.annotation.SendTo;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,23 +14,17 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import com.envn8.app.models.CHAR;
-import com.envn8.app.models.CRDT;
 import com.envn8.app.models.Documents;
 import com.envn8.app.models.User;
 import com.envn8.app.service.DocumentService;
 import com.envn8.app.service.UserService;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ext.OptionalHandlerFactory;
 
 import lombok.RequiredArgsConstructor;
 
-import com.envn8.app.payload.request.ContentRequest;
 import com.envn8.app.payload.request.DocumentRequest;
 import com.envn8.app.payload.request.ShareDocumentRequest;
 import com.envn8.app.security.config.JwtService;
-
-import org.apache.catalina.connector.Response;
+import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 
 @RestController
@@ -51,11 +40,22 @@ public class DocumentController {
     @Autowired
     private JwtService jwtService;
 
+    // This version utilizes RequiredArgsConstructor, but same functionality as
+    // above
+    // // @Autowired
+    // private final DocumentService documentService;
+    // // @Autowired // can NOT use @RequiredArgsConstructor here, @Autowired is
+    // needed
+    // private final UserService userService;
+    // // @Autowired
+    // private final JwtService jwtService;
+
     @PostMapping("/create")
     public ResponseEntity<?> createDocument(@RequestBody DocumentRequest documentRequest,
             @RequestHeader("Authorization") String token) {
         System.out.println("at the start of createDocument_temp()");
         if (token == null || token.isEmpty()) {
+            logger.error("Token is null or empty for createDocument");
             return new ResponseEntity<>("Token is null or empty", HttpStatus.UNAUTHORIZED);
         }
         String actualToken = token.replace("Bearer ", "");
@@ -142,23 +142,32 @@ public class DocumentController {
     // }
 
     @GetMapping("/viewAll")
-    public ResponseEntity<Iterable<Map<String, String>>> viewAllDocuments(
+    public ResponseEntity<?> viewAllDocuments(
             @RequestHeader("Authorization") String token) {
         String actualToken = token.replace("Bearer ", "");
         String username = jwtService.extractUsername(actualToken);
         User user = userService.getUserByUsername(username); // Get the current user
         Iterable<Documents> documents = user.getDocuments();
+        if (documents == null) {
+            logger.error("No documents found");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No documents found");
+        }
+        if(!documents.iterator().hasNext()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No documents found");
+        }
         List<Map<String, String>> result = new ArrayList<>();
         documents.forEach(doc -> {
+            if(doc!=null){
             Map<String, String> map = new HashMap<>();
             map.put("id", doc.getId());
             map.put("title", doc.getTitle());
             result.add(map);
+            }
         });
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
-    //get doc name from ID 
+    // get doc name from ID
     @GetMapping("/getDocName/{id}")
     public ResponseEntity<?> getDocName(@PathVariable String id) {
         Optional<Documents> documentOptional = documentService.getDocumentById(id);
@@ -307,13 +316,16 @@ public class DocumentController {
     // }
 
     @GetMapping("/viewShared")
-    public ResponseEntity<Iterable<Map<String, String>>> viewSharedDocuments(
+    public ResponseEntity<?> viewSharedDocuments(
             @RequestHeader("Authorization") String token) {
         String actualToken = token.replace("Bearer ", "");
         String username = jwtService.extractUsername(actualToken);
         User user = userService.getUserByUsername(username); // Get the current user
         if (user != null) {
             Iterable<Documents> sharedDocuments = user.getSharedDocuments();
+            if (sharedDocuments == null || !sharedDocuments.iterator().hasNext()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No shared documents found");
+            }
             List<Map<String, String>> result = new ArrayList<>();
             sharedDocuments.forEach(doc -> {
                 Map<String, String> map = new HashMap<>();
@@ -404,33 +416,6 @@ public class DocumentController {
             } else {
                 return new ResponseEntity<>("You are not the owner of the document", HttpStatus.FORBIDDEN);
             }
-        } else {
-            return new ResponseEntity<>("Document not found", HttpStatus.NOT_FOUND);
-        }
-    }
-
-    @GetMapping("/dc/view/{id}")
-    public ResponseEntity<?> getDocumentContent(@PathVariable String id) {
-        Optional<Documents> documentOptional = documentService.getDocumentById(id);
-        if (documentOptional.isPresent()) {
-            Documents document = documentOptional.get();
-            // List<CRDT> content = document.getContent(); // Assuming content is a property
-            // of Documents entity
-            // return new ResponseEntity<>("aloooo ya habeby", HttpStatus.OK);
-            return new ResponseEntity<>("Document exists, you can view it!", HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>("Document not found", HttpStatus.NOT_FOUND);
-        }
-    }
-
-    @GetMapping("/dc/view2/{id}")
-    public ResponseEntity<?> getDocumentContent2(@PathVariable String id) {
-        Optional<Documents> documentOptional = documentService.getDocumentById(id);
-        if (documentOptional.isPresent()) {
-            Documents document = documentOptional.get();
-            // List<CRDT> content = document.getContent(); // Assuming content is a property
-            // of Documents entity
-            return new ResponseEntity<>("aloooo ya habeby", HttpStatus.OK);
         } else {
             return new ResponseEntity<>("Document not found", HttpStatus.NOT_FOUND);
         }

@@ -1,29 +1,23 @@
 package com.envn8.app.models;
 
-import org.springframework.data.mongodb.core.mapping.DBRef;
-
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
-
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 
-// import lombok.RequiredArgsConstructor;
 @Data
 @Builder
-@NoArgsConstructor
-// @RequiredArgsConstructor
+@RequiredArgsConstructor
 @AllArgsConstructor
 @Document
 public class Documents {
@@ -45,70 +39,8 @@ public class Documents {
     // @JsonManagedReference
     @JsonBackReference // this worked
     private List<User> sharedWith; // This represents the users that the document is shared with
-    // private Map<String, String> permissions; // This represents the permissions
-    // of the shared users
-    // key is the user id and value is the permission level
 
     private Map<String, DocPermissions> permissions;
-    // public Documents() {
-    // }
-
-    public Documents(String title, List<CHAR> content, String type, User owner) {
-        this.title = title;
-        this.content = content;
-        this.owner = owner;
-        this.type = type;
-        this.sharedWith = null;
-        this.permissions = null;
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String newtitle) {
-        this.title = newtitle;
-    }
-
-    public List<CHAR> getContent() {
-        return content;
-    }
-
-    public void setContent(List<CHAR> newcontent) {
-        this.content = newcontent;
-    }
-
-    public User getOwner() {
-        return owner;
-    }
-
-    public void setOwner(User user) {
-        this.owner = user;
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String newtype) {
-        this.type = newtype;
-    }
-
-    public List<User> getSharedWith() {
-        return sharedWith;
-    }
-
-    public void setSharedWith(List<User> sharedWith) {
-        this.sharedWith = sharedWith;
-    }
 
     @Override
     public boolean equals(Object o) {
@@ -124,11 +56,5 @@ public class Documents {
     public int hashCode() {
         return Objects.hash(id);
     }
-    // public Map<String, String> getPermissions() {
-    // return permissions;
-    // }
 
-    // public void setPermissions(Map<String, String> permissions) {
-    // this.permissions = permissions;
-    // }
 }

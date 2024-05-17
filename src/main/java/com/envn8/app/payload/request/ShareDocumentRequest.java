@@ -1,6 +1,5 @@
 package com.envn8.app.payload.request;
 
-import javax.print.Doc;
 
 import com.envn8.app.models.DocPermissions;
 
@@ -22,8 +21,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class ShareDocumentRequest {
     private String username; // This represents the user that the document is shared with
-    // private String permission; // This represents the permission of the shared
-    // user
     @Enumerated(EnumType.STRING)
+    @Builder.Default
     private DocPermissions permission=DocPermissions.VIEWER;
 }

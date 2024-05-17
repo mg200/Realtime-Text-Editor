@@ -8,7 +8,7 @@ import { AuthContext } from "./AuthProvider";
 import { Link } from "react-router-dom";
 import { useLocation } from "react-router-dom";
 import NameBar from "./nameBar";
-const [docName, setDocName] = useState('');
+// const [docName, setDocName] = useState('');
 
 export default function Navbar() {
   const { isAuthenticated, logout } = useContext(AuthContext);
@@ -49,9 +49,9 @@ export default function Navbar() {
 
   
 
-  useEffect(() => {
-    getDocName(documentId).then(setDocName);
-  }, [documentId, isAuthenticated, location]);
+  // useEffect(() => {
+  //   getDocName(documentId).then(setDocName);
+  // }, [documentId, isAuthenticated, location]);
 
 
 

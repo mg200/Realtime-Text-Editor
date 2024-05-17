@@ -21,14 +21,14 @@ public class LogoutService implements LogoutHandler {
             Authentication authentication) {
         final String authHeader = request.getHeader("Authorization");
         final String jwt;
-        System.out.println("authHeader: " + authHeader);
+        // System.out.println("authHeader: " + authHeader);
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             return;
         }
         jwt = authHeader.substring(7);
         var sharedToken = tokenRepository.findByToken(jwt)
                 .orElse(null);
-        System.out.println("sharedToken: " + sharedToken);
+        // System.out.println("sharedToken: " + sharedToken);
         if (sharedToken != null) {
             sharedToken.setExpired(true);
             sharedToken.setRevoked(true);
